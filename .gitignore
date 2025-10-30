@@ -1,5 +1,5 @@
 # 编译结果
-./build
+build/
 
 # vscode设置
-./.vscode
+.vscode/
