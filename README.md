@@ -1,9 +1,14 @@
 # Multi-Party Private Membership Test (MP-PMT)
-## ![Work in Progress](https://img.shields.io/badge/status-wip-yellow) Latest Version — Work in Progress - Day0
+## Latest Version — Work in Progress - Day0
+![Work in Progress](https://img.shields.io/badge/status-wip-yellow) 
+![C++](https://img.shields.io/badge/language-C%2B%2B-blue)
+![CUDA](https://img.shields.io/badge/language-CUDA-orange)
+![Python](https://img.shields.io/badge/language-Python-3776AB?logo=python&logoColor=white)
+![CMake](https://img.shields.io/badge/build-CMake-6E9CFF?logo=cmake&logoColor=white)
 
 ## Overview
 
-This repository implements the scheme presented in the paper ***An Efficient Multi-Party Private Membership Test Scheme with GPU Acceleration*.** It provides a backend written in CUDA/C++ that efficiently performs ring operations on **both CPU and GPU**, fully implementing all the schemes described in the paper. Additionally, this repository includes scripts to run all experiments and generate figures with a single command, making it easy to reproduce the results from the paper.
+This repository implements the scheme presented in the paper ***An Efficient Multi-Party Private Membership Test Scheme with GPU Acceleration*.** It provides a backend written in C++, fully implementing all the schemes described in the paper. Additionally, this repository includes scripts to run all experiments and generate figures with a single command, making it easy to reproduce the results from the paper.
 
 In recent years, the issue of **Certificate Credential Compromise (C3)** has become increasingly prevalent. This project is designed around a multi-party C3 scenario, where multiple data holders independently maintain datasets containing weak credentials. The goal is to provide a privacy-preserving Credential Leakage Verification service. Users need to know whether their credentials have been leaked, but they should not learn about the data held by any individual data holder. Similarly, no data holder should learn the queried credential or have access to the credential datasets of other data holders.
 
@@ -14,7 +19,7 @@ In recent years, the issue of **Certificate Credential Compromise (C3)** has bec
 
 # Legacy version, tested on Ubuntu 20.04
 ![Legacy](https://img.shields.io/badge/status-legacy-red)
-
+![Ubuntu 20.04](https://img.shields.io/badge/OS-Ubuntu%2020.04-orange)
 ### Environment Setup
 
 The experimental environment for this project is as follows:
