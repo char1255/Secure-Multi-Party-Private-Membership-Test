@@ -12,7 +12,8 @@ In recent years, the issue of **Certificate Credential Compromise (C3)** has bec
 
 ------
 
-
+# Legacy version, tested on Ubuntu 20.04
+![Legacy](https://img.shields.io/badge/status-legacy-red)
 
 ### Environment Setup
 
