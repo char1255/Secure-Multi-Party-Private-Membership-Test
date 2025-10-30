@@ -1,7 +1,7 @@
 # Multi-Party Private Membership Test (MP-PMT)
 ## Latest Version — Work in Progress - Day0
 ![Work in Progress](https://img.shields.io/badge/status-wip-yellow) 
-![C++](https://img.shields.io/badge/language-C%2B%2B-blue)
+![C/C++](https://img.shields.io/badge/language-C%2B%2B-blue)
 ![CUDA](https://img.shields.io/badge/language-CUDA-orange)
 ![Python](https://img.shields.io/badge/language-Python-3776AB?logo=python&logoColor=white)
 ![CMake](https://img.shields.io/badge/build-CMake-6E9CFF?logo=cmake&logoColor=white)
@@ -19,7 +19,9 @@ In recent years, the issue of **Certificate Credential Compromise (C3)** has bec
 
 # Legacy version, tested on Ubuntu 20.04
 ![Legacy](https://img.shields.io/badge/status-legacy-red)
-![Ubuntu 20.04](https://img.shields.io/badge/OS-Ubuntu%2020.04-orange)
+![Partial](https://img.shields.io/badge/completeness-partial-orange)
+![Outdated](https://img.shields.io/badge/version-outdated-lightgrey)
+![OS: Ubuntu 20.04](https://img.shields.io/badge/OS-Ubuntu%2020.04-blue)
 ### Environment Setup
 
 The experimental environment for this project is as follows:
