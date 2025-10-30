@@ -15,13 +15,15 @@ In recent years, the issue of **Certificate Credential Compromise (C3)** has bec
 <img src="./dispfig/scene.png" alt="scene" style="zoom:70%;" />
 
 
-------
+🌌🌌🌌🌌🌌🌌🌌🌌🌌🌌
 
-# Legacy version, tested on Ubuntu 20.04
-![Legacy](https://img.shields.io/badge/status-legacy-red)
+
+# Below is the Early Version — Tested on Ubuntu 20.04
+![Prototype](https://img.shields.io/badge/status-prototype-red)
 ![Partial](https://img.shields.io/badge/completeness-partial-orange)
-![Outdated](https://img.shields.io/badge/version-outdated-lightgrey)
+![Limited Compatibility](https://img.shields.io/badge/compatibility-limited-yellow)
 ![OS: Ubuntu 20.04](https://img.shields.io/badge/OS-Ubuntu%2020.04-blue)
+
 ### Environment Setup
 
 The experimental environment for this project is as follows:
