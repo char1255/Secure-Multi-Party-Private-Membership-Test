@@ -15,8 +15,7 @@ In recent years, the issue of **Certificate Credential Compromise (C3)** has bec
 <img src="./dispfig/scene.png" alt="scene" style="zoom:70%;" />
 
 
-🌌🌌🌌🌌🌌🌌🌌🌌🌌🌌
-
+---
 
 # Below is the Early Version — Tested on Ubuntu 20.04
 ![Prototype](https://img.shields.io/badge/status-prototype-red)
