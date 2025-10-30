@@ -1,5 +1,5 @@
 # Multi-Party Private Membership Test (MP-PMT)
-## ![Work in Progress](https://img.shields.io/badge/status-wip-yellow) Work in Progress...
+## ![Work in Progress](https://img.shields.io/badge/status-wip-yellow) Latest Version — Work in Progress
 
 ## Overview
 
