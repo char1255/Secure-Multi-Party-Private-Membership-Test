@@ -1,0 +1,5 @@
+#ifndef OUT_OFF_RANGE_HPP
+#define OUT_OFF_RANGE_HPP
+
+
+#endif // !OUT_OFF_RANGE_HPP
