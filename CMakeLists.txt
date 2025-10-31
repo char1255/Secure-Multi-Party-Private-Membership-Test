@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.10)
 set(CHAR_PROJ_NAME "MP-PMT")
 project(${CHAR_PROJ_NAME} VERSION 1.0 LANGUAGES CXX)
 
-
 # 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -15,7 +14,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # 添加可执行文件
 add_executable(${CHAR_PROJ_NAME}
     src/main.cpp
-    src/demo.cpp
+    src/ring/cpu_ver/c_vector_r1.cpp
+    src/ring/cpu_ver/c_vector_r32.cpp
+    src/ring/cpu_ver/c_vector_r64.cpp
 )
 
 # 为 Demo 指定 include 路径
