@@ -2,7 +2,7 @@
 #define VECTOR_R64_HPP
 
 #include "mpmtcfg.hpp"
-#include "ring/vector_r_interface.hpp"
+#include "core/ring/vector_r_interface.hpp"
 
 /** @namespace 项目命名空间 */
 namespace mpmt

@@ -1,0 +1,1 @@
+#include "core/ring/vector_r.hpp"      

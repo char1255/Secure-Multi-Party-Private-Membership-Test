@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-#include "mpmtcfg.hpp"
+#include "core/mpmtcfg.hpp"
 
 /** @namespace 项目命名空间 */
 namespace mpmt
