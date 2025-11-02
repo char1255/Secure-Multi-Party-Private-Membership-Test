@@ -1,5 +1,5 @@
 # Multi-Party Private Membership Test (MPMT)
-## Latest Version — Work in Progress - Day2
+## Latest Version — Work in Progress - Day3
 ![Work in Progress](https://img.shields.io/badge/status-wip-yellow) 
 ![C/C++](https://img.shields.io/badge/language-C%2B%2B-blue)
 ![CUDA](https://img.shields.io/badge/language-CUDA-orange)
