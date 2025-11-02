@@ -12,12 +12,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF) 
 
 # 添加可执行文件
-add_executable(${CHAR_PROJ_NAME}
+add_executable(${CHAR_PROJ_NAME} 
     src/main.cpp
-    src/ring/cpu_ver/c_vector_r1.cpp
-    src/ring/cpu_ver/c_vector_r32.cpp
-    src/ring/cpu_ver/c_vector_r64.cpp
+    src/core/ring/rvector_stl.cpp
+    src/core/ring/rvector_xsimd.cpp
 )
+
+# src/core/ring/rvector_cuda.cu
+
 
 # 为 Demo 指定 include 路径
 target_include_directories(${CHAR_PROJ_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)

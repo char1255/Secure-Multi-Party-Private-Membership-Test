@@ -1,4 +1,4 @@
-# Multi-Party Private Membership Test (MP-PMT)
+# Multi-Party Private Membership Test (MPMT)
 ## Latest Version — Work in Progress - Day2
 ![Work in Progress](https://img.shields.io/badge/status-wip-yellow) 
 ![C/C++](https://img.shields.io/badge/language-C%2B%2B-blue)

@@ -7,6 +7,8 @@
 #define VCB_CUDA    // Vector Computing Backend: CUDA Thrust
 #define VCB_XSIMD   // Vector Computing Backend: XSIMD
 
+#define MPMT_ASSERT(cond, msg)
+
 // 自定义断言宏：在 debug ver.中，使用断言；在release ver.中使用错误抛出。
 
 /** @namespace 项目命名空间。 */
