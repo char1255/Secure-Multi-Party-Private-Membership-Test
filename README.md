@@ -10,7 +10,7 @@
 
 This repository implements the scheme presented in the paper ***An Efficient Multi-Party Private Membership Test Scheme with GPU Acceleration*.** It provides a backend written in C++, fully implementing all the schemes described in the paper. Additionally, this repository includes scripts to run all experiments and generate figures with a single command, making it easy to reproduce the results from the paper.
 
-In recent years, the issue of **Certificate Credential Compromise (C3)** has become increasingly prevalent. This project is designed around a multi-party C3 scenario, where multiple data holders independently maintain datasets containing weak credentials. The goal is to provide a privacy-preserving Credential Leakage Verification service. Users need to know whether their credentials have been leaked, but they should not learn about the data held by any individual data holder. Similarly, no data holder should learn the queried credential or have access to the credential datasets of other data holders.
+In recent years, the issue of **Compromise Credential Checking (C3)** has become increasingly prevalent. This project is designed around a multi-party C3 scenario, where multiple data holders independently maintain datasets containing weak credentials. The goal is to provide a privacy-preserving Credential Leakage Verification service. Users need to know whether their credentials have been leaked, but they should not learn about the data held by any individual data holder. Similarly, no data holder should learn the queried credential or have access to the credential datasets of other data holders.
 
 <img src="./dispfig/scene.png" alt="scene" style="zoom:70%;" />
 

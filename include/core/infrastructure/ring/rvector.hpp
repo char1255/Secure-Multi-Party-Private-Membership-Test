@@ -18,8 +18,12 @@ namespace mpmt
     {
         /** @brief 断言限制模板类型 */
         static_assert(
-            std::is_same<RT, ring1>::value || std::is_same<RT, ring32>::value || std::is_same<RT, ring64>::value,
-            "RT must be ring1, ring32, or ring64"
+            std::is_same<RT, ring1>::value 
+            || std::is_same<RT, ring8>::value 
+            || std::is_same<RT, ring16>::value 
+            || std::is_same<RT, ring32>::value 
+            || std::is_same<RT, ring64>::value,
+            "RT must be ring1, ring8, ring16, ring32, or ring64."
         );
 
     public:
@@ -134,7 +138,6 @@ namespace mpmt
     private:
         /** @class 前向声明向量适配器，由不同的显式实例化提供 */
         class _vector_adapter;
-        
     };
 }
 
@@ -145,6 +148,6 @@ extern template class mpmt::rvector<mpmt::ring32>;
 extern template class mpmt::rvector<mpmt::ring64>;
 
 // rvector.tpp实现通用模板定义
-#include "core/ring/rvector.tpp"
+#include "core/infrastructure/ring/rvector.tpp"
 
 #endif // !RVECTOR_HPP

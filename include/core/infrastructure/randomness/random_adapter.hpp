@@ -11,7 +11,7 @@ namespace mpmt
 {
     /**
      * @class   随机数适配器，用于封装不同实现的随机数接口。
-     * @tparam  DT 随机数数据类型，限定为ring32,ring64,size_t
+     * @tparam  DT 随机数数据类型，限定为 ring8, ring16 ring32, ring64, size_t
      */
     template<typename DT>
     class random_adapter
@@ -19,8 +19,13 @@ namespace mpmt
     public:
         /** @brief 断言限制模板类型 */
         static_assert(
-            std::is_same<DT, ring32>::value || std::is_same_v<DT, ring64>::value || std::is_same_v<DT, size_t>::value,
-            "DT must be one of: ring32, ring64, size_t");
+            std::is_same<DT, ring8>::value 
+            || std::is_same<DT, ring16>::value 
+            || std::is_same<DT, ring32>::value 
+            || std::is_same<DT, ring64>::value
+            || std::is_same<DT, size_t>::value,
+            "RT must be ring8, ring16, ring32, ring64 or size_t."
+        );
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         // 以下为随机数接口

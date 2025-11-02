@@ -14,13 +14,22 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # 添加可执行文件
 add_executable(${CHAR_PROJ_NAME} 
     src/main.cpp
-    src/core/ring/rvector_stl.cpp
-    src/core/ring/rvector_xsimd.cpp
+    src/core/infrastructure/randomness/random_openssl.cpp
+    src/core/infrastructure/ring/rvector_stl.cpp
+    src/core/infrastructure/ring/rvector_xsimd.cpp
+    src/core/infrastructure/communication/comm_pipe.cpp
+    src/core/protocol/ass_impl/agent_server_ass.cpp
+    src/core/protocol/ass_impl/data_holder_ass.cpp
+    src/core/protocol/ass_impl/querier_ass.cpp
+    src/core/protocol/fss_impl/agent_server_fss.cpp
+    src/core/protocol/fss_impl/data_holder_fss.cpp
+    src/core/protocol/fss_impl/querier_fss.cpp
+    src/utils/profiler.cpp
 )
 
 # src/core/ring/rvector_cuda.cu
 
 
-# 为 Demo 指定 include 路径
+# 指定 include 路径
 target_include_directories(${CHAR_PROJ_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
 # include_directories(include)  # 弃用高耦合方案

@@ -1,5 +1,5 @@
-#ifndef COMM_HPP
-#define COMM_HPP
+#ifndef COMM_ADAPTER_HPP
+#define COMM_ADAPTER_HPP
 
 #include <type_traits>
 #include <vector>
@@ -11,7 +11,7 @@ namespace mpmt
 {
     /**
      * @class   通信适配器，用于封装不同实现的通信接口。
-     * @tparam  DT 传输数据类型，限定为ring32,ring64,size_t
+     * @tparam  DT 随机数数据类型，限定为 ring8, ring16 ring32, ring64, size_t
      * @note    一个comm_adapter对象在同一时刻维护单独的一条连接，
      *          一些连接信息应通过实现类的构造函数赋值，并存储于实现类的成员变量中。
      */
@@ -21,9 +21,14 @@ namespace mpmt
     public:
         /** @brief 断言限制模板类型 */
         static_assert(
-            std::is_same<DT, ring32>::value || std::is_same_v<DT, ring64>::value || std::is_same_v<DT, size_t>::value,
-            "DT must be one of: ring32, ring64, size_t");
-        
+            std::is_same<DT, ring8>::value 
+            || std::is_same<DT, ring16>::value 
+            || std::is_same<DT, ring32>::value 
+            || std::is_same<DT, ring64>::value
+            || std::is_same<DT, size_t>::value,
+            "RT must be ring8, ring16, ring32, ring64 or size_t."
+        );
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         // 以下为连接管理接口
 
@@ -79,4 +84,4 @@ namespace mpmt
 
 }
 
-#endif // !COMM_HPP
+#endif // !COMM_ADAPTER_HPP
