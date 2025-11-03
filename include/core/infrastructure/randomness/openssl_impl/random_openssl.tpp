@@ -1,6 +1,0 @@
-#ifndef RANDOM_OPENSSL_TPP
-#define RANDOM_OPENSSL_TPP
-
-
-
-#endif // !RANDOM_OPENSSL_RPP

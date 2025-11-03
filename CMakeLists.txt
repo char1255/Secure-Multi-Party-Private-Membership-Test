@@ -5,7 +5,7 @@ set(CHAR_PROJ_NAME "MP-PMT")
 project(${CHAR_PROJ_NAME} VERSION 1.0 LANGUAGES CXX)
 
 # 设置 C++ 标准
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 禁用编译器扩展，保持标准
@@ -18,10 +18,8 @@ find_package(OpenSSL REQUIRED)
 # 添加可执行文件
 add_executable(${CHAR_PROJ_NAME} 
     src/main.cpp
-    src/core/infrastructure/randomness/random_openssl.cpp
-    src/core/infrastructure/ring/rvector_stl.cpp
-    src/core/infrastructure/ring/rvector_xsimd.cpp
-    src/core/infrastructure/communication/comm_pipe.cpp
+    src/core/ring/rvector_stl.cpp
+    src/core/ring/rvector_xsimd.cpp
     src/core/protocol/ass_impl/agent_server_ass.cpp
     src/core/protocol/ass_impl/data_holder_ass.cpp
     src/core/protocol/ass_impl/querier_ass.cpp

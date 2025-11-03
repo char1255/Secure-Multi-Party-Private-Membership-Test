@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "core/mpmtcfg.hpp"
+#include "core/ring/ring.hpp"
 
 /** @namespace 项目命名空间。 */
 namespace mpmt
@@ -21,12 +22,12 @@ namespace mpmt
     public:
         /** @brief 断言限制模板类型 */
         static_assert(
-            std::is_same<DT, ring8>::value 
-            || std::is_same<DT, ring16>::value 
-            || std::is_same<DT, ring32>::value 
-            || std::is_same<DT, ring64>::value
-            || std::is_same<DT, size_t>::value,
-            "RT must be ring8, ring16, ring32, ring64 or size_t."
+            std::is_same_v<DT, ring8>
+            || std::is_same_v<DT, ring16> 
+            || std::is_same_v<DT, ring32> 
+            || std::is_same_v<DT, ring64>
+            || std::is_same_v<DT, size_t>,
+            "DT must be ring8, ring16, ring32, ring64 or size_t."
         );
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
