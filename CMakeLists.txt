@@ -11,6 +11,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 禁用编译器扩展，保持标准
 set(CMAKE_CXX_EXTENSIONS OFF) 
 
+# 依赖库
+# 查找并链接 OpenSSL
+find_package(OpenSSL REQUIRED)
+
 # 添加可执行文件
 add_executable(${CHAR_PROJ_NAME} 
     src/main.cpp
@@ -29,6 +33,8 @@ add_executable(${CHAR_PROJ_NAME}
 
 # src/core/ring/rvector_cuda.cu
 
+# 将 OpenSSL 链接到你的目标
+target_link_libraries(${CHAR_PROJ_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 # 指定 include 路径
 target_include_directories(${CHAR_PROJ_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)

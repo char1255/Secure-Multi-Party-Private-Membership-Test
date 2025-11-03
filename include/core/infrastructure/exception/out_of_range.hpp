@@ -8,6 +8,7 @@ namespace mpmt
 {
     class out_of_range : public std::out_of_range
     {
+        
     };
 }
 #endif // !OUT_OFF_RANGE_HPP

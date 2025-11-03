@@ -21,7 +21,7 @@ namespace mpmt{
     using ring8 = uint8_t;
 
     /** @typedef 16位环 */
-    using ring16 = uint8_t;
+    using ring16 = uint16_t;
 
     /** @typedef 32位环。 */
     using ring32 = uint32_t;
