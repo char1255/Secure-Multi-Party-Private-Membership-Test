@@ -2,7 +2,7 @@
 #define RANDOM_OPENSSL_TPP
 
 #include "core/randomness/openssl_impl/random_openssl.hpp"
-
+#include "core/exception/randomness_exception/"
 template <typename DT>
 DT mpmt::random_openssl<DT>::rand() const
 {

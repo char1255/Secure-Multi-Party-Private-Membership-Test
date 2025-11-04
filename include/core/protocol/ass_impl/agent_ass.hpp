@@ -3,12 +3,12 @@
 #define DATA_HOLDER_ASS_HPP
 
 #include "core/mpmtcfg.hpp"
-#include "core/protocol/agent_server_func.hpp"
+#include "core/protocol/agent_ideal_fn.hpp"
 
 /** @namespace 项目命名空间。 */
 namespace mpmt
 {
-    class agent_server_ass : public agent_server_func 
+    class agent_ass : public agent_ideal_fn 
     {
         virtual void merge() = 0;  
         virtual void update() = 0;  

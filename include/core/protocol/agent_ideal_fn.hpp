@@ -2,12 +2,12 @@
 #define DATA_HOLDER_FUNC_HPP
 
 #include "core/mpmtcfg.hpp"
-#include "core/protocol/base_func.hpp"
+#include "core/protocol/base_ideal_fn.hpp"
 
 /** @namespace 项目命名空间。 */
 namespace mpmt
 {
-    class agent_server_func : public base_func // 代理服务器理想功能（接口）
+    class agent_ideal_fn : public base_ideal_fn // 代理方理想功能（接口）
     {
     public:
         virtual void merge() = 0;

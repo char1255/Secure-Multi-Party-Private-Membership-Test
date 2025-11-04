@@ -1,7 +1,7 @@
 #ifndef COMM_HPP
 #define COMM_HPP
 
-#include "core/communication/comm_adapter.hpp"
+#include "core/comm/comm_adapter.hpp"
 
 /** @namespace 项目命名空间。 */
 namespace mpmt
@@ -24,6 +24,6 @@ namespace mpmt
         );
     };
 }
-#include "core/communication/pipe_impl/comm_pipe.tpp"
+#include "core/comm/pipe_impl/comm_pipe.tpp"
 
 #endif // !COMM_HPP
