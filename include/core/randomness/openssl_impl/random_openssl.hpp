@@ -13,7 +13,7 @@ namespace mpmt
 {
     /**
      * @class   使用openssl实现随机数适配器
-     * @tparam  DT 随机数数据类型，限定为 ring8, ring16 ring32, ring64, size_t
+     * @tparam  DT 随机数数据类型，限定为 ring1, ring8, ring16 ring32, ring64, size_t
      */
     template<typename DT>
     class random_openssl : public random_adapter<DT>
@@ -21,7 +21,8 @@ namespace mpmt
     public:
         /** @brief 断言限制模板类型 */
         static_assert(
-            std::is_same_v<DT, ring8>
+            std::is_same_v<DT, ring1>
+            || std::is_same_v<DT, ring8> 
             || std::is_same_v<DT, ring16> 
             || std::is_same_v<DT, ring32> 
             || std::is_same_v<DT, ring64>
