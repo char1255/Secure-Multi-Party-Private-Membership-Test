@@ -1,8 +1,8 @@
 #ifndef RANDOM_OPENSSL_TPP
 #define RANDOM_OPENSSL_TPP
 
-#include "core/randomness/openssl_impl/random_openssl.hpp"
-#include "core/exception/randomness_exception/"
+#include "core/rng/openssl_impl/rng_openssl.hpp"
+#include "core/exception/rng_exc.hpp"
 template <typename DT>
 DT mpmt::random_openssl<DT>::rand() const
 {
@@ -11,14 +11,16 @@ DT mpmt::random_openssl<DT>::rand() const
       ring8 r;
       if (RAND_bytes((unsigned char *)&r, sizeof(r)) != 1)
       {
-
+         throw mpmt::rng_exc("Random byte generation failed: low entropy or internal error.")
       }
       return ring1(r);
    }
    else
    {
       DT r;
-      RAND_bytes((unsigned char *)&r, sizeof(r));
+      if (RAND_bytes((unsigned char *)&r, sizeof(r)) != 1){
+         throw mpmt::rng_exc("Random byte generation failed: low entropy or internal error.");
+      }
       return r;
    }
 }
@@ -27,19 +29,7 @@ template <typename DT>
 DT mpmt::random_openssl<DT>::rand(const DT lb, const DT ub) const
 {
    static_assert(!std::is_same_v<DT, ring1>, "mpmt::random_openssl<DT>::rand(const DT lb, const DT ub) does not support ring1.");
-
-   if constexpr (std::is_same_v<DT, ring8>)
-   {
-   }
-   else if constexpr (std::is_same_v<DT, ring16>)
-   {
-   }
-   else if constexpr (std::is_same_v<DT, ring32>)
-   {
-   }
-   else if constexpr (std::is_same_v<DT, ring64>)
-   {
-   }
+   
 }
 
 template <typename DT>

@@ -6,7 +6,7 @@
 #include <openssl/rand.h>
 
 #include "core/mpmtcfg.hpp"
-#include "core/randomness/random_adapter.hpp"
+#include "core/rng/rng_adapter.hpp"
 
 /** @namespace 项目命名空间。 */
 namespace mpmt
@@ -90,6 +90,6 @@ namespace mpmt
     };
 }
 
-#include "core/randomness/openssl_impl/random_openssl.tpp"
+#include "core/rng/openssl_impl/rng_openssl.tpp"
 
 #endif // !RANDOM_OPENSSL_HPP

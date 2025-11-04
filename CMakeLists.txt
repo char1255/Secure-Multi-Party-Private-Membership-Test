@@ -20,13 +20,13 @@ add_executable(${CHAR_PROJ_NAME}
     src/main.cpp
     src/core/ring/rvector_stl.cpp
     src/core/ring/rvector_xsimd.cpp
-    src/core/protocol/ass_impl/agent_server_ass.cpp
+    src/core/protocol/ass_impl/agent_ass.cpp
     src/core/protocol/ass_impl/data_holder_ass.cpp
     src/core/protocol/ass_impl/querier_ass.cpp
-    src/core/protocol/fss_impl/agent_server_fss.cpp
+    src/core/protocol/fss_impl/agent_fss.cpp
     src/core/protocol/fss_impl/data_holder_fss.cpp
     src/core/protocol/fss_impl/querier_fss.cpp
-    src/utils/profiler.cpp
+    src/auxkit/profiler.cpp
 )
 
 # src/core/ring/rvector_cuda.cu
