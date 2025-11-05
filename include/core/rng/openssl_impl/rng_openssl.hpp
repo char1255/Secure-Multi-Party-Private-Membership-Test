@@ -7,7 +7,6 @@
 
 #include "core/mpmtcfg.hpp"
 #include "core/rng/rng_adapter.hpp"
-#include "core/ring/rvector.hpp"
 
 /** @namespace 项目命名空间。 */
 namespace mpmt {
@@ -17,16 +16,20 @@ namespace mpmt {
      * @throw   throw mpmt::rng_exc("", mpmt::rng_exc::impl_type) 随机数生成错误
      */
     template <typename DT>
-    class random_openssl : public random_adapter<DT> {
+    class rng_openssl : public rng_adapter<DT> {
         public:
         /** @brief 断言限制模板类型 */
         static_assert(
-            std::is_same_v<DT, ring8>
+            std::is_same_v<DT, ring1>
+            || std::is_same_v<DT, ring8>
             || std::is_same_v<DT, ring16>
             || std::is_same_v<DT, ring32>
-            || std::is_same_v<DT, ring64> 
-            "DT must be ring8, ring16, ring32, ring64."
+            || std::is_same_v<DT, ring64>
+            || std::is_same_v<DT, size_t>,
+            "DT must be ring1, ring8, ring16, ring32, ring64 or size_t."
             );
+
+        rng_openssl() = default;
 
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数。
@@ -102,7 +105,7 @@ namespace mpmt {
         /**
          * @brief   析构接口。
          */
-        ~random_adapter() = default;
+        ~rng_openssl() override = default;
     };
 }
 

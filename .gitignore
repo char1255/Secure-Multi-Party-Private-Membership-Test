@@ -3,3 +3,6 @@ build/
 
 # vscode设置
 .vscode/
+
+# 本地的备份
+_some_backup

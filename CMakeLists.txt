@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+# OpenSSL 3.6.0 1 Oct 2025
+
 # 定义项目基准信息
 set(CHAR_PROJ_NAME "MP-PMT")
 project(${CHAR_PROJ_NAME} VERSION 1.0 LANGUAGES CXX)

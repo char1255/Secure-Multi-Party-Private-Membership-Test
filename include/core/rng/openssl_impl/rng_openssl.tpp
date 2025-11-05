@@ -7,7 +7,7 @@
 #include "core/exception/rng_exc.hpp"
 
 template <typename DT>
-DT mpmt::random_openssl<DT>::rand() const {
+DT mpmt::rng_openssl<DT>::rand() const {
    if constexpr (std::is_same_v<DT, ring1>) {
       ring8 r;
       if (RAND_bytes((unsigned char*)&r, sizeof(r)) != 1) {
@@ -33,16 +33,16 @@ DT mpmt::random_openssl<DT>::rand() const {
 }
 
 template <typename DT>
-mpmt::rvector<DT> mpmt::random_openssl<DT>::rand(const size_t num) const {
-   mpmt::rvector<DT> result(num);
+mpmt::rvector<DT> mpmt::rng_openssl<DT>::rand(const size_t num) const {
+   mpmt::rvector<DT> result;
 
    return std::move(result);  // 移动语义
 }
 
 
 template <typename DT>
-void mpmt::random_openssl<DT>::rand(const size_t num, mpmt::rvector<DT>& rands) const {
-   if (rand.size() != num) {
+void mpmt::rng_openssl<DT>::rand(const size_t num, mpmt::rvector<DT>& rands) const {
+   if (rands.size() != num) {
       // resize 大小
       // 发出警告
    }
@@ -50,9 +50,9 @@ void mpmt::random_openssl<DT>::rand(const size_t num, mpmt::rvector<DT>& rands) 
 
 
 template <typename DT>
-DT mpmt::random_openssl<DT>::rand(const DT lb, const DT ub) const {
+DT mpmt::rng_openssl<DT>::rand(const DT lb, const DT ub) const {
 
-   static_assert(!std::is_same_v<DT, ring1>, "mpmt::random_openssl<DT>::rand(const DT lb, const DT ub) does not support ring1.");
+   static_assert(!std::is_same_v<DT, ring1>, "mpmt::rng_openssl<DT>::rand(const DT lb, const DT ub) does not support ring1.");
 
    if (lb > ub) {
       throw mpmt::rng_exc(
@@ -82,15 +82,15 @@ DT mpmt::random_openssl<DT>::rand(const DT lb, const DT ub) const {
 }
 
 template <typename DT>
-mpmt::rvector<DT> mpmt::random_openssl<DT>::rand(const DT lb, const DT ub, const size_t num) const {
-   mpmt::rvector<DT> result(num);
+mpmt::rvector<DT> mpmt::rng_openssl<DT>::rand(const DT lb, const DT ub, const size_t num) const {
+   mpmt::rvector<DT> result;
 
    return std::move(result);  // 移动语义
 }
 
 template <typename DT>
-void mpmt::random_openssl<DT>::rand(const DT lb, const DT ub, const size_t num, mpmt::rvector<DT>& rands) const {
-   if (rand.size() != num) {
+void mpmt::rng_openssl<DT>::rand(const DT lb, const DT ub, const size_t num, mpmt::rvector<DT>& rands) const {
+   if (rands.size() != num) {
       // resize 大小
       // 发出警告
    }

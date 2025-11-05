@@ -1,6 +1,6 @@
 #include <iostream>
 
 int main() {
-    std::cout << "MPMT" << std::endl;
+    std::cout << "Secure Multi-Party Private Membership Test" << std::endl;
     return 0;
 }
