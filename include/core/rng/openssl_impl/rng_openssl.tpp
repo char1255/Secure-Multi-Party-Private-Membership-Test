@@ -6,57 +6,47 @@
 #include "core/exception/rng_exc.hpp"
 
 template <typename DT>
-DT mpmt::random_openssl<DT>::rand() const
-{
-   if constexpr (std::is_same_v<DT, ring1>)
-   {
+DT mpmt::random_openssl<DT>::rand() const {
+   if constexpr (std::is_same_v<DT, ring1>) {
       ring8 r;
-      if (RAND_bytes((unsigned char *)&r, sizeof(r)) != 1)
-      {
+      if (RAND_bytes((unsigned char*)&r, sizeof(r)) != 1) {
          throw mpmt::rng_exc(
-             "Random byte generation failed: low entropy or internal error.",
-             mpmt::rng_exc::impl_type::openssl,
-             mpmt::rng_exc::error_code::RANDOM_ENGINE_ERROR);
+            "Random byte generation failed: low entropy or internal error.",
+            mpmt::rng_exc::impl_type::openssl,
+            mpmt::rng_exc::error_code::RANDOM_ENGINE_ERROR
+         );
       }
       return ring1(r);
    }
-   else
-   {
+   else {
       DT r;
-      if (RAND_bytes((unsigned char *)&r, sizeof(r)) != 1)
-      {
+      if (RAND_bytes((unsigned char*)&r, sizeof(r)) != 1) {
          throw mpmt::rng_exc(
-             "Random byte generation failed: low entropy or internal error.",
-             mpmt::rng_exc::impl_type::openssl,
-             mpmt::rng_exc::error_code::RANDOM_ENGINE_ERROR);
+            "Random byte generation failed: low entropy or internal error.",
+            mpmt::rng_exc::impl_type::openssl,
+            mpmt::rng_exc::error_code::RANDOM_ENGINE_ERROR
+         );
       }
       return r;
    }
 }
 
 template <typename DT>
-DT mpmt::random_openssl<DT>::rand(const DT lb, const DT ub) const
-{
+DT mpmt::random_openssl<DT>::rand(const DT lb, const DT ub) const {
    static_assert(!std::is_same_v<DT, ring1>, "mpmt::random_openssl<DT>::rand(const DT lb, const DT ub) does not support ring1.");
-   
-   if (lb > ub)
-   {
+
+   if (lb > ub) {
       throw mpmt::rng_exc(
-          "Lower bound (LB) is greater than upper bound (UB).",
-          mpmt::rng_exc::impl_type::openssl,
-          mpmt::rng_exc::error_code::INVALID_INPUT);
+         "Lower bound (LB) is greater than upper bound (UB).",
+         mpmt::rng_exc::impl_type::openssl,
+         mpmt::rng_exc::error_code::INVALID_INPUT
+      );
    }
-
-   
 }
 
 template <typename DT>
-std::vector<DT> mpmt::random_openssl<DT>::rand(const DT lb, const DT ub, const size_t num) const
-{
-}
+std::vector<DT> mpmt::random_openssl<DT>::rand(const DT lb, const DT ub, const size_t num) const {}
 
 template <typename DT>
-void mpmt::random_openssl<DT>::rand(const DT lb, const DT ub, const size_t num, std::vector<DT> &rands) const
-{
-}
+void mpmt::random_openssl<DT>::rand(const DT lb, const DT ub, const size_t num, std::vector<DT>& rands) const {}
 #endif // !RANDOM_OPENSSL_RPP

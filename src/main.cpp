@@ -49,7 +49,7 @@ int main() {
 
     uint64_t iterations = 1000000; // 每个 range 测试 100 万次
 
-    std::cout << "Range Size   | Avg Loops | Avg Time (ns)\n";
+    std::cout << "Range Size   | Avg Loops | Avg Time (ms)\n";
     std::cout << "-----------------------------------------\n";
 
     for (auto r : test_ranges) {
