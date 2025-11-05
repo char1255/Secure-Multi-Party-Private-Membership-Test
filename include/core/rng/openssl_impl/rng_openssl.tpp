@@ -1,8 +1,10 @@
 #ifndef RANDOM_OPENSSL_TPP
 #define RANDOM_OPENSSL_TPP
 
+#include <vector>
 #include "core/rng/openssl_impl/rng_openssl.hpp"
 #include "core/exception/rng_exc.hpp"
+
 template <typename DT>
 DT mpmt::random_openssl<DT>::rand() const
 {
@@ -11,15 +13,22 @@ DT mpmt::random_openssl<DT>::rand() const
       ring8 r;
       if (RAND_bytes((unsigned char *)&r, sizeof(r)) != 1)
       {
-         throw mpmt::rng_exc("Random byte generation failed: low entropy or internal error.")
+         throw mpmt::rng_exc(
+             "Random byte generation failed: low entropy or internal error.",
+             mpmt::rng_exc::impl_type::openssl,
+             mpmt::rng_exc::error_code::RANDOM_ENGINE_ERROR);
       }
       return ring1(r);
    }
    else
    {
       DT r;
-      if (RAND_bytes((unsigned char *)&r, sizeof(r)) != 1){
-         throw mpmt::rng_exc("Random byte generation failed: low entropy or internal error.");
+      if (RAND_bytes((unsigned char *)&r, sizeof(r)) != 1)
+      {
+         throw mpmt::rng_exc(
+             "Random byte generation failed: low entropy or internal error.",
+             mpmt::rng_exc::impl_type::openssl,
+             mpmt::rng_exc::error_code::RANDOM_ENGINE_ERROR);
       }
       return r;
    }
@@ -29,6 +38,15 @@ template <typename DT>
 DT mpmt::random_openssl<DT>::rand(const DT lb, const DT ub) const
 {
    static_assert(!std::is_same_v<DT, ring1>, "mpmt::random_openssl<DT>::rand(const DT lb, const DT ub) does not support ring1.");
+   
+   if (lb > ub)
+   {
+      throw mpmt::rng_exc(
+          "Lower bound (LB) is greater than upper bound (UB).",
+          mpmt::rng_exc::impl_type::openssl,
+          mpmt::rng_exc::error_code::INVALID_INPUT);
+   }
+
    
 }
 
