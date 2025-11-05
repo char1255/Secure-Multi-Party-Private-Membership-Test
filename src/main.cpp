@@ -1,6 +1,7 @@
 #include <iostream>
 
-int main() {
-    std::cout << "Secure Multi-Party Private Membership Test" << std::endl;
+int main(int argc, char** argv) {
+    (void)argc; (void)argv; 
+    std::cout << "Secure Multi-Party Private Membership Test\n";
     return 0;
 }
