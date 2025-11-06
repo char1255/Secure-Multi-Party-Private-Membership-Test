@@ -9,16 +9,19 @@
 #include "core/ring/rvector.hpp"
 
 /** @namespace 项目命名空间。 */
-namespace mpmt {
+namespace mpmt
+{
     /**
      * @class   随机数适配器，用于封装不同实现的随机数接口。
      * @tparam  DT 随机数数据类型，限定为 ring8, ring16 ring32, ring64, size_t
      */
     template<typename DT>
-    class rng_adapter {
+    class rng_adapter
+    {
         public:
         /** @brief 断言限制模板类型 */
-        static_assert(
+        static_assert
+            (
             std::is_same_v<DT, ring1>
             || std::is_same_v<DT, ring8>
             || std::is_same_v<DT, ring16>
@@ -50,7 +53,8 @@ namespace mpmt {
          * @note    1. 需要保障 lb <= ub。
          *          2. 如何rands大小与num一致。
          */
-        virtual void rand(
+        virtual void rand
+        (
             const size_t num,
             mpmt::rvector<DT>& rands
         ) const = 0;

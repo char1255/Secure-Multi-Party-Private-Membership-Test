@@ -142,7 +142,7 @@ namespace mpmt
     private:
         /** @class 前向声明向量适配器，由不同的显式实例化提供 */
         class _vector_adapter;
-        _vector_adapter* impl = nullptr;
+        _vector_adapter* impl;
     };
 }
 
@@ -151,8 +151,5 @@ namespace mpmt
 // extern template class mpmt::rvector<mpmt::ring16>;
 extern template class mpmt::rvector<mpmt::ring32>;
 // extern template class mpmt::rvector<mpmt::ring64>;
-
-// rvector.tpp实现通用模板定义
-#include "core/ring/rvector.tpp"
 
 #endif // !RVECTOR_HPP
