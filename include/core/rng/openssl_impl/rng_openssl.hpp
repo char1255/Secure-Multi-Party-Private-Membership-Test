@@ -9,24 +9,25 @@
 #include "core/rng/rng_adapter.hpp"
 
 /** @namespace 项目命名空间。 */
-namespace mpmt {
+namespace mpmt
+{
     /**
      * @class   使用openssl实现随机数适配器
      * @tparam  DT 随机数数据类型，限定为 ring1, ring8, ring16 ring32, ring64, size_t
      * @throw   throw mpmt::rng_exc("", mpmt::rng_exc::impl_type) 随机数生成错误
      */
     template <typename DT>
-    class rng_openssl : public rng_adapter<DT> {
-        public:
+    class rng_openssl : public rng_adapter<DT>
+    {
+    public:
         /** @brief 断言限制模板类型 */
         static_assert(
             std::is_same_v<DT, ring1>
             || std::is_same_v<DT, ring8>
             || std::is_same_v<DT, ring16>
             || std::is_same_v<DT, ring32>
-            || std::is_same_v<DT, ring64>
-            || std::is_same_v<DT, size_t>,
-            "DT must be ring1, ring8, ring16, ring32, ring64 or size_t."
+            || std::is_same_v < DT, ring64>
+            "DT must be ring1, ring8, ring16, ring32 or ring64."
             );
 
         rng_openssl() = default;
@@ -65,7 +66,8 @@ namespace mpmt {
          * @return  DT 随机数。
          * @note    需要保障 lb <= ub。
          */
-        DT rand(
+        DT rand
+        (
             const DT lb,
             const DT ub
         ) const override;
@@ -79,7 +81,8 @@ namespace mpmt {
          * @note    1. 需要保障 lb <= ub。
          *          2. 尽量使用移动语义处理返回。
          */
-        mpmt::rvector<DT> rand(
+        mpmt::rvector<DT> rand
+        (
             const DT lb,
             const DT ub,
             const size_t num
@@ -95,7 +98,8 @@ namespace mpmt {
          * @note    1. 需要保障 lb <= ub。
          *          2. 如何rands大小与num一致。
          */
-        void rand(
+        void rand
+        (
             const DT lb,
             const DT ub,
             const size_t num,

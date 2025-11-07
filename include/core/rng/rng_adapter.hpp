@@ -18,17 +18,15 @@ namespace mpmt
     template<typename DT>
     class rng_adapter
     {
-        public:
+    public:
         /** @brief 断言限制模板类型 */
-        static_assert
-            (
+        static_assert(
             std::is_same_v<DT, ring1>
             || std::is_same_v<DT, ring8>
             || std::is_same_v<DT, ring16>
             || std::is_same_v<DT, ring32>
             || std::is_same_v<DT, ring64>
-            || std::is_same_v<DT, size_t>,
-            "DT must be ring1, ring8, ring16, ring32, ring64 or size_t."
+            "DT must be ring1, ring8, ring16, ring32 or ring64."
             );
 
         /**
