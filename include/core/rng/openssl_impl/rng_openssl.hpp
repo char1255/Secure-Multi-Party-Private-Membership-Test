@@ -21,8 +21,7 @@ namespace mpmt
     {
     public:
 
-        using rcontainer = typename rng_adapter<DT>::cont_selecter::type;
-        
+        using rcontainer = typename _ra_cont_selecter<DT>::type;
         /** @brief 默认构造函数。*/
         rng_openssl() = default;
 

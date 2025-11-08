@@ -11,6 +11,15 @@
 /** @namespace 项目命名空间。 */
 namespace mpmt
 {
+
+    /** @brief 根据模板类型选择容器 */
+    template<typename DT>
+    struct _ra_cont_selecter
+    {
+        using type = void;
+    };
+
+
     /**
      * @class   随机数适配器，用于封装不同实现的随机数接口。
      * @tparam  DT 随机数数据类型，限定为 ring8, ring16 ring32, ring64
@@ -26,17 +35,9 @@ namespace mpmt
             || std::is_same_v<DT, ring16>
             || std::is_same_v<DT, ring32>
             || std::is_same_v < DT, ring64>
-            || std::is_same_v < DT, size_t>
+            || std::is_same_v < DT, size_t>,
             "DT must be ring1, ring8, ring16, ring32, ring64 or size_t."
             );
-
-
-        /** @brief 根据模板类型选择容器 */
-        template<typename T>
-        struct cont_selecter
-        {
-            using container = void;
-        };
 
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数。
@@ -117,45 +118,45 @@ namespace mpmt
          * @brief   析构接口。
          */
         virtual ~rng_adapter() = default;
-
-
-    public:
-        // 实例化选择类型
-        template<>
-        struct mpmt::cont_selecter<size_t>
-        {
-            using container = std::vector<size_t>;
-        };
-
-        template<>
-        struct mpmt::cont_selecter<mpmt::ring1>
-        {
-            using container = mpmt::rvector<ring1>;
-        };
-
-        template<>
-        struct mpmt::cont_selecter<mpmt::ring8>
-        {
-            using container = mpmt::rvector<ring8>;
-        };
-        
-        template<>
-        struct mpmt::cont_selecter<mpmt::ring16>
-        {
-            using container = mpmt::rvector<ring16>;
-        };
-        
-        template<>
-        struct mpmt::cont_selecter<mpmt::ring32>
-        {
-            using container = mpmt::rvector<ring32>;
-        };
-        
-        template<>
-        struct mpmt::cont_selecter<mpmt::ring64>
-        {
-            using container = mpmt::rvector<ring64>;
-        };
     };
+
+
+    // 特化选择类型
+    template<>
+    struct _ra_cont_selecter<size_t>
+    {
+        using type = std::vector<size_t>;
+    };
+
+    template<>
+    struct _ra_cont_selecter<mpmt::ring1>
+    {
+        using type = mpmt::rvector<ring1>;
+    };
+
+    template<>
+    struct _ra_cont_selecter<mpmt::ring8>
+    {
+        using type = mpmt::rvector<ring8>;
+    };
+
+    template<>
+    struct _ra_cont_selecter<mpmt::ring16>
+    {
+        using type = mpmt::rvector<ring16>;
+    };
+
+    template<>
+    struct _ra_cont_selecter<mpmt::ring32>
+    {
+        using type = mpmt::rvector<ring32>;
+    };
+
+    template<>
+    struct _ra_cont_selecter<mpmt::ring64>
+    {
+        using type = mpmt::rvector<ring64>;
+    };
+
 }
 #endif // !RANDOM_ADAPTER_HPP

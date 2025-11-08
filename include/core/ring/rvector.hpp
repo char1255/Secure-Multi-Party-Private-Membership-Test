@@ -29,8 +29,16 @@ namespace mpmt
             "RT must be ring1, ring8, ring16, ring32, or ring64."
             );
 
-        rvector() = default;
-        explicit rvector(size_t n);
+
+        rvector() = default;                       // 默认构造
+        explicit rvector(size_t n);                // 指定大小构造
+        rvector(size_t n, const RT& value);        // 指定大小 + 默认值构造
+        rvector(std::initializer_list<RT> init);   // 初始化列表构造
+        rvector(const rvector& other);             // 拷贝构造
+        rvector(rvector&& other) noexcept;         // 移动构造
+
+        template<typename InputIt>                 // 范围构造
+        rvector(InputIt first, InputIt last);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         // 暴露迭代器接口
@@ -141,7 +149,7 @@ namespace mpmt
         ~rvector();
 
     private:
-        RT* _data;
+        RT* const _data;
     };
 }
 
