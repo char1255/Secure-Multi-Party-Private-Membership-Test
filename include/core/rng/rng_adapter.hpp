@@ -13,7 +13,7 @@ namespace mpmt
 {
     /**
      * @class   随机数适配器，用于封装不同实现的随机数接口。
-     * @tparam  DT 随机数数据类型，限定为 ring8, ring16 ring32, ring64, size_t
+     * @tparam  DT 随机数数据类型，限定为 ring8, ring16 ring32, ring64
      */
     template<typename DT>
     class rng_adapter
@@ -25,9 +25,18 @@ namespace mpmt
             || std::is_same_v<DT, ring8>
             || std::is_same_v<DT, ring16>
             || std::is_same_v<DT, ring32>
-            || std::is_same_v<DT, ring64>
-            "DT must be ring1, ring8, ring16, ring32 or ring64."
+            || std::is_same_v < DT, ring64>
+            || std::is_same_v < DT, size_t>
+            "DT must be ring1, ring8, ring16, ring32, ring64 or size_t."
             );
+
+
+        /** @brief 根据模板类型选择容器 */
+        template<typename T>
+        struct cont_selecter
+        {
+            using container = void;
+        };
 
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数。
@@ -38,11 +47,11 @@ namespace mpmt
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数数组。
          * @param   const size_t num 随机数数组的大小
-         * @return  mpmt::rvector<DT> 随机数数组。
+         * @return  rcontainer 随机数数组。
          * @note    1. 需要保障 lb <= ub。
          *          2. 尽量使用移动语义处理返回。
          */
-        virtual mpmt::rvector<DT> rand(const size_t num) const = 0;
+        virtual rcontainer rand(const size_t num) const = 0;
 
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数数组。
@@ -54,7 +63,7 @@ namespace mpmt
         virtual void rand
         (
             const size_t num,
-            mpmt::rvector<DT>& rands
+            rcontainer& rands
         ) const = 0;
 
         /**
@@ -75,11 +84,11 @@ namespace mpmt
          * @param   const DT lb 取值下界
          * @param   const DT ub 取值上界
          * @param   const size_t num 随机数数组的大小
-         * @return  mpmt::rvector<DT> 随机数数组
+         * @return  rcontainer 随机数数组
          * @note    1. 需要保障 lb <= ub。
          *          2. 尽量使用移动语义处理返回。
          */
-        virtual mpmt::rvector<DT> rand
+        virtual rcontainer rand
         (
             const DT lb,
             const DT ub,
@@ -91,7 +100,7 @@ namespace mpmt
          * @param   const DT lb 取值下界
          * @param   const DT ub 取值上界
          * @param   const size_t num 随机数数组的大小
-         * @param   mpmt::rvector<DT>& rands 用于返回生成的随机数数组
+         * @param   rcontainer& rands 用于返回生成的随机数数组
          * @return  void
          * @note    1. 需要保障 lb <= ub。
          *          2. 如何rands大小与num一致。
@@ -101,14 +110,52 @@ namespace mpmt
             const DT lb,
             const DT ub,
             const size_t num,
-            mpmt::rvector<DT>& rands
+            rcontainer& rands
         ) const = 0;
 
         /**
          * @brief   析构接口。
          */
         virtual ~rng_adapter() = default;
-    };
 
+
+    public:
+        // 实例化选择类型
+        template<>
+        struct mpmt::cont_selecter<size_t>
+        {
+            using container = std::vector<size_t>;
+        };
+
+        template<>
+        struct mpmt::cont_selecter<mpmt::ring1>
+        {
+            using container = mpmt::rvector<ring1>;
+        };
+
+        template<>
+        struct mpmt::cont_selecter<mpmt::ring8>
+        {
+            using container = mpmt::rvector<ring8>;
+        };
+        
+        template<>
+        struct mpmt::cont_selecter<mpmt::ring16>
+        {
+            using container = mpmt::rvector<ring16>;
+        };
+        
+        template<>
+        struct mpmt::cont_selecter<mpmt::ring32>
+        {
+            using container = mpmt::rvector<ring32>;
+        };
+        
+        template<>
+        struct mpmt::cont_selecter<mpmt::ring64>
+        {
+            using container = mpmt::rvector<ring64>;
+        };
+    };
 }
 #endif // !RANDOM_ADAPTER_HPP

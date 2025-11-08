@@ -12,6 +12,7 @@ DT mpmt::rng_openssl<DT>::rand() const
    if constexpr (std::is_same_v<DT, ring1>)
    {
       ring8 r;
+
       if (RAND_bytes((unsigned char*)&r, sizeof(r)) != 1)
       {
          throw mpmt::rng_exc
@@ -21,6 +22,7 @@ DT mpmt::rng_openssl<DT>::rand() const
             mpmt::rng_exc::error_code::RANDOM_ENGINE_ERROR
          );
       }
+
       return ring1(r);
    }
    else
@@ -40,16 +42,20 @@ DT mpmt::rng_openssl<DT>::rand() const
 }
 
 template <typename DT>
-mpmt::rvector<DT> mpmt::rng_openssl<DT>::rand(const size_t num) const
+mpmt::rng_openssl<DT>::rcontainer mpmt::rng_openssl<DT>::rand(const size_t num) const
 {
-   mpmt::rvector<DT> result;
+   mpmt::rng_openssl<DT>::rcontainer result;
 
-   return std::move(result);  // 移动语义
+   return std::move(result);
 }
 
 
 template <typename DT>
-void mpmt::rng_openssl<DT>::rand(const size_t num, mpmt::rvector<DT>& rands) const
+void mpmt::rng_openssl<DT>::rand
+(
+   const size_t num,
+   mpmt::rng_openssl<DT>::rcontainer& rands
+) const
 {
    if (rands.size() != num)
    {
@@ -97,15 +103,26 @@ DT mpmt::rng_openssl<DT>::rand(const DT lb, const DT ub) const
 }
 
 template <typename DT>
-mpmt::rvector<DT> mpmt::rng_openssl<DT>::rand(const DT lb, const DT ub, const size_t num) const
+mpmt::rng_openssl<DT>::rcontainer mpmt::rng_openssl<DT>::rand
+(
+   const DT lb,
+   const DT ub,
+   const size_t num
+) const
 {
-   mpmt::rvector<DT> result;
+   mpmt::rng_openssl<DT>::rcontainer result;
 
    return std::move(result);  // 移动语义
 }
 
 template <typename DT>
-void mpmt::rng_openssl<DT>::rand(const DT lb, const DT ub, const size_t num, mpmt::rvector<DT>& rands) const
+void mpmt::rng_openssl<DT>::rand
+(
+   const DT lb,
+   const DT ub,
+   const size_t num,
+   mpmt::rng_openssl<DT>::rcontainer& rands
+) const
 {
    if (rands.size() != num)
    {

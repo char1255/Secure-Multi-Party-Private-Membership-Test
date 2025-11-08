@@ -145,10 +145,10 @@ namespace mpmt
     };
 }
 
-// extern template class mpmt::rvector<mpmt::ring1>;
-// extern template class mpmt::rvector<mpmt::ring8>;
-// extern template class mpmt::rvector<mpmt::ring16>;
+extern template class mpmt::rvector<mpmt::ring1>;
+extern template class mpmt::rvector<mpmt::ring8>;
+extern template class mpmt::rvector<mpmt::ring16>;
 extern template class mpmt::rvector<mpmt::ring32>;
-// extern template class mpmt::rvector<mpmt::ring64>;
+extern template class mpmt::rvector<mpmt::ring64>;
 
 #endif // !RVECTOR_HPP

@@ -20,16 +20,10 @@ namespace mpmt
     class rng_openssl : public rng_adapter<DT>
     {
     public:
-        /** @brief 断言限制模板类型 */
-        static_assert(
-            std::is_same_v<DT, ring1>
-            || std::is_same_v<DT, ring8>
-            || std::is_same_v<DT, ring16>
-            || std::is_same_v<DT, ring32>
-            || std::is_same_v < DT, ring64>
-            "DT must be ring1, ring8, ring16, ring32 or ring64."
-            );
 
+        using rcontainer = typename rng_adapter<DT>::cont_selecter::type;
+        
+        /** @brief 默认构造函数。*/
         rng_openssl() = default;
 
         /**
@@ -41,11 +35,11 @@ namespace mpmt
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数数组。
          * @param   const size_t num 随机数数组的大小
-         * @return  mpmt::rvector<DT> 随机数数组。
+         * @return  rcontainer 随机数数组。
          * @note    1. 需要保障 lb <= ub。
          *          2. 尽量使用移动语义处理返回。
          */
-        mpmt::rvector<DT> rand(const size_t num) const override;
+        rcontainer rand(const size_t num) const override;
 
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数数组。
@@ -56,7 +50,7 @@ namespace mpmt
          */
         void rand(
             const size_t num,
-            mpmt::rvector<DT>& rands
+            rcontainer& rands
         ) const override;
 
         /**
@@ -77,11 +71,11 @@ namespace mpmt
          * @param   const DT lb 取值下界
          * @param   const DT ub 取值上界
          * @param   const size_t num 随机数数组的大小
-         * @return  mpmt::rvector<DT> 新构造的随机数数组
+         * @return  rcontainer 新构造的随机数数组
          * @note    1. 需要保障 lb <= ub。
          *          2. 尽量使用移动语义处理返回。
          */
-        mpmt::rvector<DT> rand
+        rcontainer rand
         (
             const DT lb,
             const DT ub,
@@ -93,7 +87,7 @@ namespace mpmt
          * @param   const DT lb 取值下界
          * @param   const DT ub 取值上界
          * @param   const size_t num 随机数数组的大小
-         * @param   mpmt::rvector<DT>& rands 用于返回生成的随机数数组
+         * @param   rcontainer& rands 用于返回生成的随机数数组
          * @return  void
          * @note    1. 需要保障 lb <= ub。
          *          2. 如何rands大小与num一致。
@@ -103,7 +97,7 @@ namespace mpmt
             const DT lb,
             const DT ub,
             const size_t num,
-            mpmt::rvector<DT>& rands
+            rcontainer& rands
         ) const override;
 
         /**
