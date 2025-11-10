@@ -4,12 +4,13 @@
 #include <vector>
 #include <limits>
 #include "core/rng/openssl_impl/rng_openssl.hpp"
-#include "core/exception/rng_exc.hpp"
+#include "core/exception/rng_exc/rng_openssl_exc.hpp"
 
 /** @namespace 项目命名空间。 */
 namespace mpmt
 {
 
+   
    template <typename DT>
    DT rng_openssl<DT>::rand() const
    {
@@ -19,11 +20,10 @@ namespace mpmt
 
          if (RAND_bytes((unsigned char*)&r, sizeof(r)) != 1)
          {
-            throw rng_exc
+            throw rng_openssl_exc
             (
                "Random number generation failed: low entropy or internal error.",
-               rng_exc::impl_type::openssl,
-               rng_exc::error_code::RANDOM_ENGINE_ERROR
+               rng_openssl_exc::error_code::RANDOM_ENGINE_ERROR
             );
          }
 
@@ -34,11 +34,10 @@ namespace mpmt
          DT r;
          if (RAND_bytes((unsigned char*)&r, sizeof(r)) != 1)
          {
-            throw rng_exc
+            throw rng_openssl_exc
             (
                "Random number generation failed: low entropy or internal error.",
-               rng_exc::impl_type::openssl,
-               rng_exc::error_code::RANDOM_ENGINE_ERROR
+               rng_openssl_exc::error_code::RANDOM_ENGINE_ERROR
             );
          }
          return r;
@@ -74,11 +73,10 @@ namespace mpmt
       static_assert(!std::is_same_v<DT, ring1>, "rng_openssl<DT>::rand(const DT lb, const DT ub) does not support ring1.");
       if (lb > ub)
       {
-         throw rng_exc
+         throw rng_openssl_exc
          (
             "Lower bound (LB) is greater than upper bound (UB).",
-            rng_exc::impl_type::openssl,
-            rng_exc::error_code::INVALID_INPUT
+            rng_openssl_exc::error_code::INVALID_INPUT
          );
       }
 

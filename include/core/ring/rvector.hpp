@@ -21,23 +21,27 @@ namespace mpmt
 
         /** @brief 断言限制模板类型 */
         static_assert(
-            std::is_same_v<RT, ring1>
-            || std::is_same_v<RT, ring8>
-            || std::is_same_v<RT, ring16>
-            || std::is_same_v<RT, ring32>
-            || std::is_same_v<RT, ring64>,
+            std::is_same_v<RT, ring1> ||
+            std::is_same_v<RT, ring8> ||
+            std::is_same_v<RT, ring16> ||
+            std::is_same_v<RT, ring32> ||
+            std::is_same_v<RT, ring64>,
             "RT must be ring1, ring8, ring16, ring32, or ring64."
             );
 
+        rvector();                                      // 默认构造
 
-        rvector() = default;                       // 默认构造
-        explicit rvector(size_t n);                // 指定大小构造
-        rvector(size_t n, const RT& value);        // 指定大小 + 默认值构造
-        rvector(std::initializer_list<RT> init);   // 初始化列表构造
-        rvector(const rvector& other);             // 拷贝构造
-        rvector(rvector&& other) noexcept;         // 移动构造
+        explicit rvector(size_t n);                     // 指定大小构造
 
-        template<typename InputIt>                 // 范围构造
+        rvector(size_t n, const RT value);              // 指定大小 + 默认值构造
+
+        rvector(std::initializer_list<RT> init_list);   // 初始化列表构造
+
+        rvector(const rvector& other);                  // 拷贝构造
+
+        rvector(rvector&& other) noexcept;              // 移动构造
+
+        template<typename InputIt>                      // 范围构造
         rvector(InputIt first, InputIt last);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,6 +140,12 @@ namespace mpmt
         // 其他
 
         /**
+         * @brief   获取向量和
+         * @return  RT 环上向量和
+         */
+        RT reduce() const noexcept;
+
+        /**
          * @brief   常量下标访问运算符
          * @return  size_t 向量大小
          */
@@ -149,8 +159,17 @@ namespace mpmt
         ~rvector();
 
     private:
-        RT* const _data;
+        RT* m_data;
+        size_t m_size;
     };
+
+    /** @brief ring1类型完全特化 */
+    template <>
+    class rvector<ring1>
+    {
+    public:
+    };
+
 }
 
 extern template class mpmt::rvector<mpmt::ring1>;

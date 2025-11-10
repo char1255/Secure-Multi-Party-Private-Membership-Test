@@ -11,13 +11,31 @@
 /** @namespace 项目命名空间。 */
 namespace mpmt
 {
-
-    /** @brief 根据模板类型选择容器 */
-    template<typename DT>
-    struct _ra_cont_selecter
+    namespace verborgen
     {
-        using type = void;
-    };
+        /** @brief 模板支持参数 */
+        template<typename DT>
+        inline constexpr bool rng_adapter_supported =
+            std::is_same_v<DT, ring1>   ||
+            std::is_same_v<DT, ring8>   ||
+            std::is_same_v<DT, ring16>  ||
+            std::is_same_v<DT, ring32>  ||
+            std::is_same_v<DT, ring64>  ||
+            std::is_same_v<DT, size_t>;
+
+        /** @brief 根据模板类型选择容器 */
+        template<typename DT>
+        struct radom_vector_container
+        {
+            /** @brief 检测类型白名单 */
+            static_assert(
+                verborgen::rng_adapter_supported,
+                "random_vector_container requires specialization for this DT type."
+                );
+
+            using type = void;
+        };
+    }
 
 
     /**
@@ -28,14 +46,11 @@ namespace mpmt
     class rng_adapter
     {
     public:
+        using rcontainer = typename radom_vector_container<DT>::type;
+
         /** @brief 断言限制模板类型 */
         static_assert(
-            std::is_same_v<DT, ring1>
-            || std::is_same_v<DT, ring8>
-            || std::is_same_v<DT, ring16>
-            || std::is_same_v<DT, ring32>
-            || std::is_same_v < DT, ring64>
-            || std::is_same_v < DT, size_t>,
+            verborgen::rng_adapter_supported,
             "DT must be ring1, ring8, ring16, ring32, ring64 or size_t."
             );
 
@@ -123,37 +138,37 @@ namespace mpmt
 
     // 特化选择类型
     template<>
-    struct _ra_cont_selecter<size_t>
+    struct verborgen::radom_vector_container<size_t>
     {
         using type = std::vector<size_t>;
     };
 
     template<>
-    struct _ra_cont_selecter<mpmt::ring1>
+    struct verborgen::radom_vector_container<mpmt::ring1>
     {
         using type = mpmt::rvector<ring1>;
     };
 
     template<>
-    struct _ra_cont_selecter<mpmt::ring8>
+    struct verborgen::radom_vector_container<mpmt::ring8>
     {
         using type = mpmt::rvector<ring8>;
     };
 
     template<>
-    struct _ra_cont_selecter<mpmt::ring16>
+    struct verborgen::radom_vector_container<mpmt::ring16>
     {
         using type = mpmt::rvector<ring16>;
     };
 
     template<>
-    struct _ra_cont_selecter<mpmt::ring32>
+    struct verborgen::radom_vector_container<mpmt::ring32>
     {
         using type = mpmt::rvector<ring32>;
     };
 
     template<>
-    struct _ra_cont_selecter<mpmt::ring64>
+    struct verborgen::radom_vector_container<mpmt::ring64>
     {
         using type = mpmt::rvector<ring64>;
     };

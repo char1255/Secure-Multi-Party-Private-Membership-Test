@@ -6,7 +6,9 @@
 /** @namespace 项目命名空间。*/
 namespace mpmt
 {
-    /** 
+    // 实验时全部采用\mathbb{Z}_{2^n}：模2^n的整数环
+
+    /**
      * @class       ring1
      * @brief       1位环
      * @internal    内部数据类型，without注释
@@ -15,33 +17,48 @@ namespace mpmt
     class ring1
     {
     public:
-        ring1() noexcept : _v(0) {}
-        ring1(uint8_t v) noexcept : _v(v & 1) {}
-        ring1(const ring1 &o) noexcept = default;
-        ring1& operator=(uint8_t v) noexcept { _v = v & 1; return *this; }
-        ring1& operator=(const ring1& v) noexcept { _v = v._v; return *this; }
-        ring1 operator+(const ring1& other) const noexcept { return ring1(_v ^ other._v); }
-        ring1 operator-(const ring1& other) const noexcept { return ring1(_v ^ other._v); }
-        ring1 operator*(const ring1& other) const noexcept { return ring1(_v & other._v); }
-        ring1& operator+=(const ring1& other) noexcept { _v ^= other._v; return *this; }
-        ring1& operator-=(const ring1& other) noexcept { _v ^= other._v; return *this; }
-        ring1& operator*=(const ring1& other) noexcept { _v &= other._v; return *this; }
-        bool operator==(const ring1& other) const noexcept { return _v == other._v; }
-        bool operator!=(const ring1& other) const noexcept { return _v != other._v; }
-        friend std::ostream& operator<<(std::ostream& os, const ring1& r) { return os << static_cast<int>(r._v); }
+        ring1() noexcept : m_v(0) {}
+        ring1(uint8_t v) noexcept : m_v(v & 1) {}
+        ring1(const ring1& o) noexcept = default;
+        ring1& operator=(uint8_t v) noexcept { m_v = v & 1; return *this; }
+        ring1& operator=(const ring1& v) noexcept { m_v = v.m_v; return *this; }
+        ring1 operator+(const ring1& other) const noexcept { return ring1(m_v ^ other.m_v); }
+        ring1 operator-(const ring1& other) const noexcept { return ring1(m_v ^ other.m_v); }
+        ring1 operator*(const ring1& other) const noexcept { return ring1(m_v & other.m_v); }
+        ring1& operator+=(const ring1& other) noexcept { m_v ^= other.m_v; return *this; }
+        ring1& operator-=(const ring1& other) noexcept { m_v ^= other.m_v; return *this; }
+        ring1& operator*=(const ring1& other) noexcept { m_v &= other.m_v; return *this; }
+        bool operator==(const ring1& other) const noexcept { return m_v == other.m_v; }
+        bool operator!=(const ring1& other) const noexcept { return m_v != other.m_v; }
+        friend std::ostream& operator<<(std::ostream& os, const ring1& r) { return os << static_cast<int>(r.m_v); }
+
+        template<typename RT>
+        RT fill_bits()
+        {
+            static_assert(
+                std::is_same_v<RT, ring8> ||
+                std::is_same_v<RT, ring16> ||
+                std::is_same_v<RT, ring32> ||
+                std::is_same_v<RT, ring64>,
+                "RT must be ring8, ring16, ring32, or ring64."
+                );
+
+            RT data = static_cast<RT>(0);
+            return (m_v == 0) ? data : ~data;
+        }
 
     private:
-        uint8_t _v;
-        ring1 operator^(const ring1 &) = delete;
-        ring1& operator^=(const ring1 &) = delete;
-        ring1 operator|(const ring1 &) = delete;
-        ring1& operator|=(const ring1 &) = delete;
-        ring1 operator/(const ring1 &) = delete;
-        ring1& operator/=(const ring1 &) = delete;
-        bool operator>(const ring1 &) = delete;
-        bool operator<(const ring1 &) = delete;
-        bool operator>=(const ring1 &) = delete;
-        bool operator<=(const ring1 &) = delete;
+        uint8_t m_v;
+        ring1 operator^(const ring1&) = delete;
+        ring1& operator^=(const ring1&) = delete;
+        ring1 operator|(const ring1&) = delete;
+        ring1& operator|=(const ring1&) = delete;
+        ring1 operator/(const ring1&) = delete;
+        ring1& operator/=(const ring1&) = delete;
+        bool operator>(const ring1&) = delete;
+        bool operator<(const ring1&) = delete;
+        bool operator>=(const ring1&) = delete;
+        bool operator<=(const ring1&) = delete;
     };
 
     /** @typedef  */
@@ -57,7 +74,22 @@ namespace mpmt
     using ring64 = uint64_t;
 
     template <typename RT>
-    inline RT boolean_to_arithmetic();
+    inline RT boolean_to_arithmetic()
+    {
+        static_assert(
+            std::is_same_v<RT, ring1> ||
+            std::is_same_v<RT, ring8> ||
+            std::is_same_v<RT, ring16> ||
+            std::is_same_v<RT, ring32> ||
+            std::is_same_v<RT, ring64>,
+            "RT must be ring1, ring8, ring16, ring32, or ring64."
+            );
+
+        return RT(); // TO BE UPDATED
+    }
+
+
+
 
 }
 #endif // !RING_HPP
