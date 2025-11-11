@@ -12,10 +12,10 @@ int main(int argc, char** argv)
 
     auto start = std::chrono::high_resolution_clock::now();
     
-    a += b;
-    a += b;
-    a += b;
-    a += b;
+
+    for(size_t i = 0; i < 10;++i){
+        a += b;
+    }
 
     auto end = std::chrono::high_resolution_clock::now();
     

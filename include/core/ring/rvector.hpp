@@ -14,9 +14,18 @@ namespace mpmt
     /** @namespace 内部实现细节 */
     namespace verborge
     {
-        // class rvector_base
-        // {
-        // };
+        template <typename RT>
+        class rvector_base
+        {
+        public:
+#ifdef MPMT_VCB_STL
+            size_t m_ring64s_num_;
+#elif MPMT_VCB_CUDA
+
+#elif MPMT_VCB_SIMD
+
+#endif
+        };
     }
 
     /**
@@ -24,7 +33,7 @@ namespace mpmt
      * @tparam  RT 环类型，限定为ring1,ring32，ring64
      */
     template <typename RT>
-    class rvector
+    class rvector : public verborge::rvector_base<RT>
     {
     public:
         /** @brief 断言限制模板类型 */
@@ -119,6 +128,10 @@ namespace mpmt
          */
         rvector<RT>& operator*=(const RT scalar);
 
+        bool operator==(const rvector<RT>& other) const;
+        bool operator!=(const rvector<RT>& other) const;
+
+
         /**
          * @brief   获取向量和
          * @return  RT 环上向量和
@@ -139,8 +152,8 @@ namespace mpmt
         ~rvector();
 
     private:
-        std::unique_ptr<RT[]> m_data;
-        size_t m_size;
+        std::unique_ptr<RT[]> m_data_;
+        size_t m_size_;
 
         /** @brief 禁用大于运算符 */
         bool operator>(const rvector<RT>& other) const = delete;
