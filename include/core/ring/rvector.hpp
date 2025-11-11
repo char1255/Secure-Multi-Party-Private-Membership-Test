@@ -2,6 +2,7 @@
 #define RVECTOR_HPP
 
 #include <type_traits>
+#include <memory>
 
 #include "core/mpmtcfg.hpp"
 #include "core/ring/ring.hpp"
@@ -9,6 +10,14 @@
 /** @namespace 项目命名空间 */
 namespace mpmt
 {
+
+    /** @namespace 内部实现细节 */
+    namespace verborge
+    {
+        // class rvector_base
+        // {
+        // };
+    }
 
     /**
      * @class   环上数组统一接口
@@ -18,7 +27,6 @@ namespace mpmt
     class rvector
     {
     public:
-
         /** @brief 断言限制模板类型 */
         static_assert(
             std::is_same_v<RT, ring1> ||
@@ -41,50 +49,25 @@ namespace mpmt
 
         rvector(rvector&& other) noexcept;              // 移动构造
 
-        template<typename InputIt>                      // 范围构造
-        rvector(InputIt first, InputIt last);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        // 暴露迭代器接口
-
-        /** @class 前向声明迭代器类型，由实现类提供 */
-        class iterator;
-
-        /** @class 前向声明常量迭代器类型，由实现类提供 */
-        class const_iterator;
+        /**
+         * @brief   拷贝赋值
+         * @param   const rvector<RT>& other 拷贝对象
+         * @return  rvector<RT>& 当前向量的引用
+         */
+        rvector<RT>& operator=(const rvector<RT>& other);
 
         /**
-         * @brief   获取起始迭代器
-         * @return  iterator 指向第一个元素的迭代器
+         * @brief   移动赋值
+         * @param   rvector<RT>&& other 移动对象
+         * @return  rvector<RT>& 当前向量的引用
          */
-        iterator begin();
+        rvector<RT>& operator=(rvector<RT>&& other) noexcept;
 
         /**
-         * @brief 获取结束迭代器
-         * @return iterator 指向最后一个元素之后位置的迭代器
-         */
-        iterator end();
-
-        /**
-         * @brief 获取常量起始迭代器
-         * @return const_iterator 指向第一个元素的常量迭代器
-         */
-        const_iterator begin() const;
-
-        /**
-         * @brief 获取常量结束迭代器
-         * @return const_iterator 指向最后一个元素之后位置的常量迭代器
-         */
-        const_iterator end() const;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        // 重载向量操作符
-
-        /**
-         * @brief   下标访问运算符
-         * @param   size_t index 索引位置
-         * @return  RT& 对应位置的元素引用
-         */
+        * @brief   下标访问运算符
+        * @param   size_t index 索引位置
+        * @return  RT& 对应位置的元素引用
+        */
         RT& operator[](size_t index);
 
         /**
@@ -136,9 +119,6 @@ namespace mpmt
          */
         rvector<RT>& operator*=(const RT scalar);
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        // 其他
-
         /**
          * @brief   获取向量和
          * @return  RT 环上向量和
@@ -159,17 +139,21 @@ namespace mpmt
         ~rvector();
 
     private:
-        RT* m_data;
+        std::unique_ptr<RT[]> m_data;
         size_t m_size;
-    };
 
-    /** @brief ring1类型完全特化 */
-    template <>
-    class rvector<ring1>
-    {
-    public:
-    };
+        /** @brief 禁用大于运算符 */
+        bool operator>(const rvector<RT>& other) const = delete;
 
+        /** @brief 禁用小于运算符 */
+        bool operator<(const rvector<RT>& other) const = delete;
+
+        /** @brief 禁用大于等于运算符 */
+        bool operator>=(const rvector<RT>& other) const = delete;
+
+        /** @brief 禁用小于等于运算符 */
+        bool operator<=(const rvector<RT>& other) const = delete;
+    };
 }
 
 extern template class mpmt::rvector<mpmt::ring1>;

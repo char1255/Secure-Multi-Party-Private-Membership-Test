@@ -33,19 +33,7 @@ namespace mpmt
         friend std::ostream& operator<<(std::ostream& os, const ring1& r) { return os << static_cast<int>(r.m_v); }
 
         template<typename RT>
-        RT fill_bits()
-        {
-            static_assert(
-                std::is_same_v<RT, ring8> ||
-                std::is_same_v<RT, ring16> ||
-                std::is_same_v<RT, ring32> ||
-                std::is_same_v<RT, ring64>,
-                "RT must be ring8, ring16, ring32, or ring64."
-                );
-
-            RT data = static_cast<RT>(0);
-            return (m_v == 0) ? data : ~data;
-        }
+        RT fill_bits();
 
     private:
         uint8_t m_v;
@@ -88,8 +76,20 @@ namespace mpmt
         return RT(); // TO BE UPDATED
     }
 
+    template<typename RT>
+    RT ring1::fill_bits()
+    {
+        static_assert(
+            std::is_same_v<RT, ring8> ||
+            std::is_same_v<RT, ring16> ||
+            std::is_same_v<RT, ring32> ||
+            std::is_same_v<RT, ring64>,
+            "RT must be ring8, ring16, ring32, or ring64."
+            );
 
-
+        RT data = static_cast<RT>(0);
+        return (m_v == 0) ? data : ~data;
+    }
 
 }
 #endif // !RING_HPP
