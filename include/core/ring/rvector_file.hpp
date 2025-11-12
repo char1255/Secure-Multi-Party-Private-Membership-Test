@@ -21,10 +21,7 @@ namespace mpmt
             "RT must be ring1, ring8, ring16, ring32, or ring64."
             );
 
-        rvector_file(const std::string& file_path)
-        {
-            
-        }
+        rvector_file(const std::string& file_path){}
 
         ~rvector_file();
 
