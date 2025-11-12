@@ -24,10 +24,10 @@ mpmt::rvector<RT>::rvector
 }
 
 template<typename RT>
-mpmt::rvector<RT>::rvector(std::initializer_list<RT> init_list)
-    : rvector(init_list.size())
+mpmt::rvector<RT>::rvector(const std::vector<RT>& list)
+    : rvector(list.size())
 {
-    std::copy(init_list.begin(), init_list.end(), m_data_.get());
+    std::copy(list.begin(), list.end(), m_data_.get());
 }
 
 template <typename RT>
@@ -194,8 +194,11 @@ template<typename RT>
 mpmt::rvector<RT>::~rvector() { /** 智能指针自动析构 */ }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// 显式实例化
+// ring1 模板特化
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// 显式实例化
 template class mpmt::rvector<mpmt::ring1>;
 template class mpmt::rvector<mpmt::ring8>;
 template class mpmt::rvector<mpmt::ring16>;

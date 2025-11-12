@@ -5,25 +5,21 @@
 
 int main(int argc, char** argv)
 {
-    const std::size_t vector_size = 1e7;
-
-    mpmt::rvector<mpmt::ring32> a(vector_size);
-    mpmt::rvector<mpmt::ring32> b(vector_size);
-
-    auto start = std::chrono::high_resolution_clock::now();
-    
-
-    for(size_t i = 0; i < 10;++i){
-        a += b;
-    }
-
-    auto end = std::chrono::high_resolution_clock::now();
-    
-    auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    
-    std::cout << "Secure Multi-Party Private Membership Test\n";
-    std::cout << duration_ms.count() << " milliseconds\n";
-
     (void)argc; (void)argv;
+    // std::cout << "Secure Multi-Party Private Membership Test\n";
+
+// 1. 获取四个字符的 uint8_t 整数值
+    uint32_t byte4 = static_cast<uint32_t>('M'); // 0x4D (77)
+    uint32_t byte3 = static_cast<uint32_t>('P'); // 0x50 (80)
+    uint32_t byte2 = static_cast<uint32_t>('M'); // 0x4D (77)
+    uint32_t byte1 = static_cast<uint32_t>('T'); // 0x54 (84)
+
+    uint32_t result_32bit = 0x4D504D54; // "MPMT" 
+
+    std::cout << "32-bit Integer (Dec): "
+        << std::dec                
+        << result_32bit
+        << std::endl;
+
     return 0;
 }
