@@ -34,9 +34,9 @@ namespace mpmt
         /** @brief 构造函数 */
         void save(const std::string& save_path);
 
-        std::unique_ptr<T[]> move_ownership()
+        std::unique_ptr<T[]> release_buffer()
         {
-
+            return std::move(this->m_buffer);
         }
 
         /** @brief 析构函数 */
@@ -48,13 +48,13 @@ namespace mpmt
         static inline constexpr uint64_t SOF_LEN = 8;                   // 文件头标识长度（单位：字节）
         static inline constexpr uint64_t COF_LEN = 8;                   // 文件尾标识长度（单位：字节）
         static inline constexpr uint64_t CRC_LEN = 8;                   // 循环冗余校验码长度（单位：字节）
-        static inline constexpr uint64_t SOF_64 = 0x464F535F544D504D;  // 文件头-标识 "MPMT_SOF"
-        static inline constexpr uint64_t EOF_64 = 0x464F455F544D504D;  // 文件尾-标识 "MPMT_EOF"
+        static inline constexpr uint64_t SOF_64 = 0x464F535F544D504D;   // 文件头-标识 "MPMT_SOF"
+        static inline constexpr uint64_t EOF_64 = 0x464F455F544D504D;   // 文件尾-标识 "MPMT_EOF"
 
         /** @brief 禁用拷贝与移动操作 */
         const uint8_t m_ring_size_;     // 文件头-环大小（2, 2^8, 2^16, 2^32, 2^64）
         const uint64_t m_size;          // 文件头-数据量, 支持m_size个T类型数据, 共计 m_size*sizeof(T) bytes
-        T* const m_buffer;              // 数据载荷段
+        std::unique_ptr<T[]> m_buffer;  // 数据载荷段
 
         /** @brief 禁用拷贝与移动操作 */
         rvector_file() = delete;                                    // 禁止默认构造
