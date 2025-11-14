@@ -3,6 +3,8 @@
 
 #include <string>
 #include "core/ring/ring.hpp"
+#include "core/crc/crc64.hpp"
+#include "core/crc/crc64_ecma.hpp"
 
 /** @namespace 项目命名空间 */
 namespace mpmt
@@ -24,6 +26,9 @@ namespace mpmt
         /** @brief 唯一允许的构造函数 */
         explicit rvector_file(const std::string& load_path)
         {
+            // 定义crc计算接口
+            std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma>();
+            
             // 检查八字节头是否为MPMT
             // 读入1字节ring_size
             // 读入八字节：文件长度， 暂时限定为2^35最大，保留2^64
@@ -36,6 +41,9 @@ namespace mpmt
         /** @brief 构造函数 */
         void save(const std::string& save_path, const bool is_encrypt = false)
         {
+            // 定义crc计算接口
+            std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma>();
+            
             // 新建文件
             // 写入文件头
             // 写入1字节，表示环大小，即 m_ring_size
