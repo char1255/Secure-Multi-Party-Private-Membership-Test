@@ -2,9 +2,35 @@
 #define RING_FILE_HPP
 
 #include <string>
+#include <memory>
+
 #include "core/ring/ring.hpp"
 #include "core/crc/crc64.hpp"
 #include "core/crc/crc64_ecma182.hpp"
+
+
+template<typename T>
+static inline T swap_uint(T val)
+{
+    static_assert(
+        std::is_same_v<T, uint16_t> ||
+        std::is_same_v<T, uint32_t> ||
+        std::is_same_v<T, uint64_t>,
+        "T must be uint16_t, uint32_t, or uint64_t."
+    );
+
+    if constexpr (std::is_same_v<T, uint16_t>) {
+        return __builtin_bswap16(val);
+    } else if constexpr (std::is_same_v<T, uint32_t>) {
+        return __builtin_bswap32(val);
+    } else {
+        return __builtin_bswap64(val);
+    }
+}
+
+// rvector file
+// 
+// 
 
 /** @namespace 项目命名空间 */
 namespace mpmt
@@ -28,7 +54,7 @@ namespace mpmt
         {
             // 定义crc计算接口
             std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
-            
+
             // 检查八字节头是否为MPMT
             // 读入1字节ring_size
             // 读入八字节：文件长度， 暂时限定为2^35最大，保留2^64
@@ -43,7 +69,7 @@ namespace mpmt
         {
             // 定义crc计算接口
             std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
-            
+
             // 新建文件
             // 写入文件头
             // 写入1字节，表示环大小，即 m_ring_size
@@ -64,19 +90,19 @@ namespace mpmt
 
     private:
         /** @brief constant */
-        static inline constexpr uint64_t SOF_LEN = 8;                   // 文件头标识长度（单位：字节）
-        static inline constexpr uint64_t COF_LEN = 8;                   // 文件尾标识长度（单位：字节）
+        static inline constexpr uint64_t BOF_64 = 0x4D5256465F424F46;   // 文件头-标识"MRVF_BOF"
+        static inline constexpr uint64_t BOF_LEN = 8;                   // 文件头标识长度（单位：字节）
+        static inline constexpr uint64_t EOF_64 = 0x4D5256465F454F46;   // 文件尾-标识"MRVF_EOF"
+        static inline constexpr uint64_t EOF_LEN = 8;                   // 文件尾标识长度（单位：字节）
         static inline constexpr uint64_t CRC_LEN = 8;                   // 循环冗余校验码长度（单位：字节）
-        static inline constexpr uint64_t RING_SIZE_LEN = 1;             // 环大小长度（单位：字节）
-        static inline constexpr uint64_t SIZE_LEN = 8;                  // 数据段大小长度（单位：字节）
-        static inline constexpr uint64_t SOF_64 = 0x464F535F544D504D;   // 文件头-标识 "MPMT_SOF"
-        static inline constexpr uint64_t EOF_64 = 0x464F455F544D504D;   // 文件尾-标识 "MPMT_EOF"
-        static inline constexpr char*    FILE_EXTENSION = ".mrvf";      // 文件t拓展名
+        static inline constexpr std::string FILE_EXTENSION = ".mrvf";   // 文件t拓展名
 
-        /** @brief 禁用拷贝与移动操作 */
-        const uint8_t m_ring_size;      // 文件头-环大小（2, 2^8, 2^16, 2^32, 2^64）
-        const uint64_t m_size;          // 文件头-数据量, 支持m_size个T类型数据, 共计 m_size 个 T
-        std::unique_ptr<T[]> m_buffer;  // 数据载荷段
+        static inline constexpr uint64_t RING_SIZE_LEN = 1;             // 环大小长度（单位：字节）
+        const uint8_t m_ring_size;                                      // 文件头-环大小（2, 2^8, 2^16, 2^32, 2^64）
+
+        static inline constexpr uint64_t DATA_SIZE_LEN = 8;             // 数据段大小长度（单位：字节）
+        const uint64_t m_data_size;                                     // 文件头-数据量, 支持m_size个T类型数据, 共计 m_size 个 T
+        std::unique_ptr<T[]> m_buffer;                                  // 数据载荷段
 
         /** @brief 禁用拷贝与移动操作 */
         rvector_file() = delete;                                    // 禁止默认构造
