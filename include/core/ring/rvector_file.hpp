@@ -4,7 +4,7 @@
 #include <string>
 #include "core/ring/ring.hpp"
 #include "core/crc/crc64.hpp"
-#include "core/crc/crc64_ecma.hpp"
+#include "core/crc/crc64_ecma182.hpp"
 
 /** @namespace 项目命名空间 */
 namespace mpmt
@@ -27,7 +27,7 @@ namespace mpmt
         explicit rvector_file(const std::string& load_path)
         {
             // 定义crc计算接口
-            std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma>();
+            std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
             
             // 检查八字节头是否为MPMT
             // 读入1字节ring_size
@@ -42,7 +42,7 @@ namespace mpmt
         void save(const std::string& save_path, const bool is_encrypt = false)
         {
             // 定义crc计算接口
-            std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma>();
+            std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
             
             // 新建文件
             // 写入文件头
@@ -68,9 +68,10 @@ namespace mpmt
         static inline constexpr uint64_t COF_LEN = 8;                   // 文件尾标识长度（单位：字节）
         static inline constexpr uint64_t CRC_LEN = 8;                   // 循环冗余校验码长度（单位：字节）
         static inline constexpr uint64_t RING_SIZE_LEN = 1;             // 环大小长度（单位：字节）
-        static inline constexpr uint64_  SIZE_LEN = 8;                  // 数据段大小长度（单位：字节）
+        static inline constexpr uint64_t SIZE_LEN = 8;                  // 数据段大小长度（单位：字节）
         static inline constexpr uint64_t SOF_64 = 0x464F535F544D504D;   // 文件头-标识 "MPMT_SOF"
         static inline constexpr uint64_t EOF_64 = 0x464F455F544D504D;   // 文件尾-标识 "MPMT_EOF"
+        static inline constexpr char*    FILE_EXTENSION = ".mrvf";      // 文件t拓展名
 
         /** @brief 禁用拷贝与移动操作 */
         const uint8_t m_ring_size;      // 文件头-环大小（2, 2^8, 2^16, 2^32, 2^64）

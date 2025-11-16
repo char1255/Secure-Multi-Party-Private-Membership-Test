@@ -1,5 +1,5 @@
-#ifndef CRC64_ECMA_HPP
-#define CRC64_ECMA_HPP
+#ifndef crc64_ecma182_HPP
+#define crc64_ecma182_HPP
 
 #include <cstdint>
 #include <vector>
@@ -9,7 +9,7 @@
 /** @namespace 项目命名空间 */
 namespace mpmt
 {
-    class crc64_ecma : public crc64
+    class crc64_ecma182 : public crc64
     {
     public:
         uint64_t compute(const uint8_t* const data, const size_t len) override;
@@ -87,4 +87,4 @@ namespace mpmt
 
     };
 }
-#endif // !CRC64_ECMA_HPP
+#endif // !crc64_ecma182_HPP

@@ -1,17 +1,6 @@
 #include <iostream>
 #include <chrono>
-#include <string>
-#include "core/ring/rvector.hpp"
-#include "core/ring/ring.hpp"
-#include <iomanip>
-
-#include "core/crc/crc64_ecma.hpp"
-#include <cstring>
-#include <memory>
-
-using namespace std;
-using namespace std::chrono;
-using namespace mpmt;
+#include <xsimd/xsimd.hpp>
 
 int main(int argc, char** argv)
 {
@@ -19,3 +8,4 @@ int main(int argc, char** argv)
     // std::cout << "Secure Multi-Party Private Membership Test\n";
     return 0;
 }
+
