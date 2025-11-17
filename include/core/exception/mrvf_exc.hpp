@@ -13,6 +13,8 @@ namespace mpmt
         {
             FILE_OPEN_ERROR,
             FILE_SEEK_ERROR,
+            FILE_UNEXPECTED_BOF,
+            FILE_UNEXPECTED_EOF,
             SIZE
         };
 
@@ -31,9 +33,11 @@ namespace mpmt
         {
             switch (type)
             {
-                case error_type::FILE_OPEN_ERROR :   return "MRVF File open error: " + info;
-                case error_type::FILE_SEEK_ERROR :   return "MRVF File seek error: " + info;
-                default:                             return "MRVF Unknown exception: " + info;
+                case error_type::FILE_OPEN_ERROR        :   return "MRVF File open error: " + info;
+                case error_type::FILE_SEEK_ERROR        :   return "MRVF File seek error: " + info;
+                case error_type::FILE_UNEXPECTED_BOF    :   return "MRVF Unexpected begin(header) of file: " + info;
+                case error_type::FILE_UNEXPECTED_EOF    :   return "MRVF Unexpected end(footer) of file: " + info;
+                default:                                    return "MRVF Unknown exception: " + info;
             }
         }
     };

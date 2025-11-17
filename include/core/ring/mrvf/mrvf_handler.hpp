@@ -52,7 +52,8 @@ namespace mpmt
             );
 
         /** @brief 唯一允许的构造函数 */
-        explicit mrvf_handler(
+        explicit mrvf_handler
+        (
             const std::string& load_path,
             const bool use_memory_mapping = false
         );
@@ -82,22 +83,15 @@ namespace mpmt
 
 
     private:
-        const bool m_use_memory_mapping;                                 // 是否使用内存映像
-
-        static inline constexpr uint64_t RING_SIZE_LEN = 1;             // 环大小长度（单位：字节）
-        const uint8_t m_ring_size;                                      // 文件头-环大小（2, 2^8, 2^16, 2^32, 2^64）
-
-        static inline constexpr uint64_t DATA_SIZE_LEN = 8;             // 数据段大小长度（单位：字节）
-        const uint64_t m_data_size;                                     // 文件头-数据量, 支持m_size个T类型数据, 共计 m_size 个 T
+        const bool m_use_memory_mapping;                                // 是否使用内存映像
+        uint8_t m_ring_size;                                            // 环大小：环位宽
+        uint64_t m_data_size;                                           // 数据大小：m_data_size * sizeof(T) (bytes)
         std::unique_ptr<T[]> m_buffer;                                  // 数据载荷段
 
         /** @brief constant */
-        static inline constexpr uint64_t BOF_64 = 0x4D5256465F424F46;   // 文件头-标识"MRVF_BOF"
-        static inline constexpr uint64_t BOF_LEN = 8;                   // 文件头标识长度（单位：字节）
-        static inline constexpr uint64_t EOF_64 = 0x4D5256465F454F46;   // 文件尾-标识"MRVF_EOF"
-        static inline constexpr uint64_t EOF_LEN = 8;                   // 文件尾标识长度（单位：字节）
-        static inline constexpr uint64_t CRC_LEN = 8;                   // 循环冗余校验码长度（单位：字节）
-        static inline constexpr std::string FILE_EXTENSION = ".mrvf";   // 文件t拓展名
+        static inline constexpr uint64_t M_BOF = 0x4D5256465F424F46;    // 文件头-标识"MRVF_BOF"
+        static inline constexpr uint64_t M_EOF = 0x4D5256465F454F46;    // 文件尾-标识"MRVF_EOF"
+        static inline constexpr std::string M_FILE_EXTENSION = ".mrvf"; // 文件t拓展名
 
         /** @brief 禁用拷贝与移动操作 */
         mrvf_handler() = delete;                                    // 禁止默认构造
@@ -107,5 +101,7 @@ namespace mpmt
         mrvf_handler& operator=(mrvf_handler&&) = delete;           // 禁止移动赋值
     };
 }
+
+#include "core/ring/mrvf/mrvf_handler.tpp"
 
 #endif // !MRVF_HANDLER_HPP

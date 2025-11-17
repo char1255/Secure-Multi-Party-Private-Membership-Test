@@ -33,6 +33,7 @@ namespace mpmt
         // 常规文件读取 
         else
         {
+            // RAII 文件配置
             std::ifstream in_file(load_path, std::ios::binary);
             if (!in_file)
             {
@@ -42,7 +43,41 @@ namespace mpmt
                 );
             }
 
-            in_file.seekg();
+            // 读取文件头
+            uint64_t fhead, reverse_fhead;
+            in_file.read(reinterpret_cast<char*>(&fhead, sizeof(uint64_t)));
+            reverse_fhead = swap_uint<uint64_t>(fhead);
+            if (fhead != this->M_BOF && reverse_fhead != this->M_BOF)
+            {
+                throw mpmt::mrvf_exc
+                (
+                    mrvf_exc::error_type::FILE_UNEXPECTED_BOF,
+                    "Unexpected file header: " + load_path
+                )
+            }
+
+            // 读取版本
+            in_file.seekg(8);
+            if (!in_file)
+            {
+                throw mpmt::mrvf_exc(
+                    mrvf_exc::error_type::FILE_OPEN_ERROR,
+                    "Can not open file: " + load_path
+                );
+            }
+
+            // 读取版本
+            in_file.seekg(1);
+            if (!in_file)
+            {
+                throw mpmt::mrvf_exc(
+                    mrvf_exc::error_type::FILE_OPEN_ERROR,
+                    "Can not open file: " + load_path
+                );
+            }
+
+
+
         }
 
         // 检查八字节头是否为MPMT
