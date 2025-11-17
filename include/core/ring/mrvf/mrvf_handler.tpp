@@ -12,9 +12,6 @@ namespace mpmt
     ) :
         m_use_memory_mapping(use_memory_mapping)
     {
-        // 定义crc计算接口
-        std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
-
         // 使用内存映像
         if (m_use_memory_mapping)
         {
@@ -33,6 +30,10 @@ namespace mpmt
         // 常规文件读取 
         else
         {
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//          首要工作任务！！！！！！！！！将整个完整读入，而非分段seek，非数据段一共也才三十几个字节，无所谓的
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
             // RAII 文件配置
             std::ifstream in_file(load_path, std::ios::binary);
             if (!in_file)
@@ -45,20 +46,32 @@ namespace mpmt
             }
 
             // 读取文件头
-            uint64_t fhead, reversed_fhead;
-            in_file.read(reinterpret_cast<char*>(&fhead, sizeof(uint64_t)));
-            reversed_fhead = swap_uint<uint64_t>(fhead);
-            if (fhead != this->M_BOF && reversed_fhead != this->M_BOF)
+            uint64_t fBOF;             // 文件头magic number
+            uint64_t reversed_fBOF;    // 调整端序后的文件头
+            bool is_little_endian;      // 判断当前系统为大端还是小端
+            in_file.read(reinterpret_cast<char*>(&fBOF), sizeof(uint64_t));
+            reversed_fBOF = swap_endian<uint64_t>(fBOF);
+            if (fBOF == this->M_BOF)
             {
+                // 文件默认为小端，则系统为小端
+                is_little_endian = true;
+            }
+            else if (reversed_fBOF == this->M_BOF)
+            {
+                // 文件默认为小端，则系统为大端
+                is_little_endian = false;
+            }
+            else
+            {
+                // 文件头不匹配，抛出错误
                 throw mpmt::mrvf_exc
                 (
                     mrvf_exc::error_type::FILE_INVALID_BOF,
-                    "Unexpected file header [" + load_path + "]"
+                    "Invalid file header (BOF) [" + load_path + "]"
                 )
             }
 
             // 读取版本
-            uint8_t fversion;
             in_file.seekg(8);
             if (!in_file)
             {
@@ -68,10 +81,10 @@ namespace mpmt
                     "Can not seek file [" + load_path + "] at offset=8."
                 );
             }
-            in_file.read(reinterpret_cast<char*>(&fversion, sizeof(uint8_t)));
+            in_file.read(reinterpret_cast<char*>(&m_version), sizeof(uint8_t));
 
             // 读取环大小
-            uint8_t fring_size;
+            uint8_t m_ring_size;
             in_file.seekg(1);
             if (!in_file)
             {
@@ -81,33 +94,113 @@ namespace mpmt
                     "Can not seek file [" + load_path + "] at offset=9."
                 );
             }
-            in_file.read(reinterpret_cast<char*>(&fring_size, sizeof(uint8_t)));
-            if (fring_size != sizeof(T))
+            in_file.read(reinterpret_cast<char*>(&m_ring_size), sizeof(uint8_t));
+            if (m_ring_size != sizeof(T))
             {
                 throw mpmt::mrvf_exc
                 (
                     mrvf_exc::error_type::FILE_RING_SIZE_MISMATCH,
-                    "从文件 " + load_path
-                    + "中读取的ring_size字段值无法使用mrvf_handler<ring" 
-                    + std::to_string(8 * sizeof(T)) 
-                    + ">载入。"
-                    
-                )
+                    "File [" + load_path
+                    + "] specifies a ring \mathbb{Z}_{2^"
+                    + std::to_string(m_ring_size) +
+                    "} and cannot be loaded via mrvf_handler<ring"
+                    + std::to_string(8 * sizeof(T))
+                    + ">."
+                );
             }
 
             // 读取向量大小
+            in_file.seekg(1);
+            if (!in_file)
+            {
+                throw mpmt::mrvf_exc
+                (
+                    mrvf_exc::error_type::FILE_SEEK_ERROR,
+                    "Can not seek file [" + load_path + "] at offset=10."
+                );
+            }
+            in_file.read(reinterpret_cast<char*>(&m_rvector_size), sizeof(uint64_t));
 
+            // 读取向量
+            m_rvector_buf = std::make_unique<T[]>(m_rvector_size);
+            in_file.read(reinterpret_cast<char*>(m_rvector_buf.get()), m_rvector_size * sizeof(T));
+            if (!is_little_endian)  // 如果是大端序，则调整向量的端序
+            {
+                /**
+                 * 这里其实考虑：如果端序调整的开销过高，则需要在文件中标注端序，文件跨系统运行时，
+                 * 需要检测计算机端序，并调整文件端序，此后便无需调整。
+                 * 这里暂时先默认文件为小端序写入的，等后面profiling一下调整端序的开销
+                 */
+                for (size_t i = 0;i < m_rvector_size;++i)
+                {
+                    swap_endian<T>(m_rvector_buf[i]);
+                }
+            }
 
+            // 读取CRC
+            uint64_t expected_crc64;   // 从文件中读出来的crc值
+            uint64_t computed_crc64;   // 校验计算得到的crc值
+            in_file.seekg(m_ring_size * sizeof(T));
+            if (!in_file)
+            {
+                throw mpmt::mrvf_exc
+                (
+                    mrvf_exc::error_type::FILE_SEEK_ERROR,
+                    "Can not seek file [" + load_path + "] at offset="
+                    + std::to_string(10 + m_ring_size * sizeof(T)) + "."
+                );
+            }
+            in_file.read(reinterpret_cast<char*>(&expected_crc64), sizeof(uint64_t));
+
+            // 实例化CRC计算接口，并计算CRC64校验值
+            std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
+
+            // ...待实现计算校验
+            // ... 
+
+            // 读入文件尾
+            uint64_t fEOF;             // 文件尾magic number
+            in_file.seekg(1);
+            in_file.read(reinterpret_cast<char*>(&fEOF), sizeof(uint64_t));
+            if (!is_little_endian)
+            {
+                swap_endian<uint64_t>(fEOF);
+            }
+            if(fEOF != this->M_EOF){  // 文件尾不匹配，抛出错误
+                throw mpmt::mrvf_exc
+                (
+                    mrvf_exc::error_type::FILE_INVALID_EOF,
+                    "Invalid file footer (EOF) [" + load_path + "]"
+                )
+            }
         }
-
-        // 读入1字节ring_size
-        // 读入八字节：文件长度， 暂时限定为2^35最大，保留2^64
-        // 顺次读入数据
-        // 读入八字节CRC, 并校验CRC是否正确
-        // 检查文件尾
-        // 你无需关注其他情况，我自己会处理，你先写一个示例
     }
 
+
+    template<typename T>
+    void mrvf_handler<T>::save(const std::string& save_path)
+    {
+        // 实例化crc计算接口
+        std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
+
+        // 新建文件
+        // 写入文件头
+        // 写入1字节，表示环大小，即 m_ring_size
+        // 写入8字节，表示文件长度，即 m_size
+        // 根据m_size，写入m_size个T数据
+        // 计算数据段+环大小+文件长这一段的CRC，并写入八字节CRC
+        // 写入文件尾
+    }
+
+    template<typename T>
+    std::unique_ptr<T[]>  mrvf_handler<T>::release_buffer()
+    {
+        return std::move(this->m_rvector_buf);
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    //  还需要对 T==ring1 进行特化实现
 
 }
 #endif // !MRVF_HANDLER_TPP

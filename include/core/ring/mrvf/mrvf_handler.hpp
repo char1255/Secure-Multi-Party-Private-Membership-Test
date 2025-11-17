@@ -11,7 +11,7 @@
 #include "core/crc/crc64_ecma182.hpp"
 
 template<typename T>
-static inline T swap_uint(T val)
+static inline T swap_endian(T val)
 {
     static_assert(
         std::is_same_v<T, uint16_t> ||
@@ -58,25 +58,11 @@ namespace mpmt
             const bool use_memory_mapping = false
         );
 
-        /** @brief 构造函数 */
-        void save(const std::string& save_path)
-        {
-            // 定义crc计算接口
-            std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
+        /** @brief 保存函数 */
+        void save(const std::string& save_path);
 
-            // 新建文件
-            // 写入文件头
-            // 写入1字节，表示环大小，即 m_ring_size
-            // 写入8字节，表示文件长度，即 m_size
-            // 根据m_size，写入m_size个T数据
-            // 计算数据段+环大小+文件长这一段的CRC，并写入八字节CRC
-            // 写入文件尾
-        }
-
-        std::unique_ptr<T[]> release_buffer()
-        {
-            return std::move(this->m_buffer);
-        }
+        /** @brief 转义所有权 */
+        std::unique_ptr<T[]> release_buffer();
 
         /** @brief 析构函数 */
         ~mrvf_handler();
@@ -84,9 +70,10 @@ namespace mpmt
 
     private:
         const bool m_use_memory_mapping;                                // 是否使用内存映像
+        uint8_t m_version;
         uint8_t m_ring_size;                                            // 环大小：环位宽
-        uint64_t m_data_size;                                           // 向量大小：m_data_size * sizeof(T) (bytes)
-        std::unique_ptr<T[]> m_buffer;                                  // 数据载荷段
+        uint64_t m_rvector_size;                                        // 向量大小：m_rvector_size * sizeof(T) (bytes)
+        std::unique_ptr<T[]> m_rvector_buf;                             // 数据载荷段
 
         /** @brief constant */
         static inline constexpr uint64_t M_BOF = 0x4D5256465F424F46;    // 文件头-标识"MRVF_BOF"
