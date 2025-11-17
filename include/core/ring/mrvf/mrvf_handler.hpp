@@ -85,7 +85,7 @@ namespace mpmt
     private:
         const bool m_use_memory_mapping;                                // 是否使用内存映像
         uint8_t m_ring_size;                                            // 环大小：环位宽
-        uint64_t m_data_size;                                           // 数据大小：m_data_size * sizeof(T) (bytes)
+        uint64_t m_data_size;                                           // 向量大小：m_data_size * sizeof(T) (bytes)
         std::unique_ptr<T[]> m_buffer;                                  // 数据载荷段
 
         /** @brief constant */
