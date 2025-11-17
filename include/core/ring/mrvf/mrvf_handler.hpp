@@ -1,11 +1,12 @@
-#ifndef RING_FILE_HPP
-#define RING_FILE_HPP
+#ifndef MRVF_HANDLER_HPP
+#define MRVF_HANDLER_HPP
 
 #include <string>
 #include <memory>
 #include <fstream>
 
 #include "core/ring/ring.hpp"
+#include "core/exception/mrvf_exc.hpp"
 #include "core/crc/crc64.hpp"
 #include "core/crc/crc64_ecma182.hpp"
 
@@ -33,15 +34,11 @@ static inline T swap_uint(T val)
     }
 }
 
-// rvector file
-// 
-// 
-
 /** @namespace 项目命名空间 */
 namespace mpmt
 {
     template<typename T>
-    class rvector_file
+    class mrvf_handler
     {
     public:
         /** @brief 断言限制模板类型 */
@@ -55,35 +52,10 @@ namespace mpmt
             );
 
         /** @brief 唯一允许的构造函数 */
-        explicit rvector_file(
+        explicit mrvf_handler(
             const std::string& load_path,
             const bool use_memory_mapping = false
-        ) :
-            m_use_memory_mapping(use_memory_mapping)
-        {
-            // 定义crc计算接口
-            std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
-
-            if (m_use_memory_mapping)   // 使用内存映像
-            {
-            }
-            else                        // 常规文件读取 
-            {
-                std::ifstream in_file(load_path, std::ios::binary);
-                if (!in_file)
-                {
-                    throw std::runtime_error("Can not open this file.");
-                }
-            }
-
-            // 检查八字节头是否为MPMT
-            // 读入1字节ring_size
-            // 读入八字节：文件长度， 暂时限定为2^35最大，保留2^64
-            // 顺次读入数据
-            // 读入八字节CRC, 并校验CRC是否正确
-            // 检查文件尾
-            // 你无需关注其他情况，我自己会处理，你先写一个示例
-        }
+        );
 
         /** @brief 构造函数 */
         void save(const std::string& save_path)
@@ -106,7 +78,7 @@ namespace mpmt
         }
 
         /** @brief 析构函数 */
-        ~rvector_file();
+        ~mrvf_handler();
 
 
     private:
@@ -128,12 +100,12 @@ namespace mpmt
         static inline constexpr std::string FILE_EXTENSION = ".mrvf";   // 文件t拓展名
 
         /** @brief 禁用拷贝与移动操作 */
-        rvector_file() = delete;                                    // 禁止默认构造
-        rvector_file(const rvector_file&) = delete;                 // 禁止拷贝构造
-        rvector_file(rvector_file&&) = delete;                      // 禁止移动构造
-        rvector_file& operator=(const rvector_file&) = delete;      // 禁止拷贝赋值
-        rvector_file& operator=(rvector_file&&) = delete;           // 禁止移动赋值
+        mrvf_handler() = delete;                                    // 禁止默认构造
+        mrvf_handler(const mrvf_handler&) = delete;                 // 禁止拷贝构造
+        mrvf_handler(mrvf_handler&&) = delete;                      // 禁止移动构造
+        mrvf_handler& operator=(const mrvf_handler&) = delete;      // 禁止拷贝赋值
+        mrvf_handler& operator=(mrvf_handler&&) = delete;           // 禁止移动赋值
     };
 }
 
-#endif // !RING_FILE_HPP
+#endif // !MRVF_HANDLER_HPP

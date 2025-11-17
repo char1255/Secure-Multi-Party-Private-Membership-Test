@@ -3,14 +3,15 @@
 
 #include <vector>
 #include <limits>
+#include "core/mpmtcfg.hpp"
 #include "core/rng/openssl_impl/rng_openssl.hpp"
-#include "core/exception/rng_exc/rng_openssl_exc.hpp"
+#include "core/exception/rng_exc.hpp"
 
 /** @namespace 项目命名空间。 */
 namespace mpmt
 {
 
-   
+
    template <typename DT>
    DT rng_openssl<DT>::rand() const
    {
@@ -20,10 +21,10 @@ namespace mpmt
 
          if (RAND_bytes((unsigned char*)&r, sizeof(r)) != 1)
          {
-            throw rng_openssl_exc
+            throw rng_exc
             (
-               "Random number generation failed: low entropy or internal error.",
-               rng_openssl_exc::error_code::RANDOM_ENGINE_ERROR
+               rng_exc::impl_type::OPENSSL,
+               "random number generation failed, low entropy or internal error."
             );
          }
 
@@ -34,10 +35,10 @@ namespace mpmt
          DT r;
          if (RAND_bytes((unsigned char*)&r, sizeof(r)) != 1)
          {
-            throw rng_openssl_exc
+            throw rng_exc
             (
-               "Random number generation failed: low entropy or internal error.",
-               rng_openssl_exc::error_code::RANDOM_ENGINE_ERROR
+               rng_exc::impl_type::OPENSSL,
+               "random number generation failed, low entropy or internal error."
             );
          }
          return r;
@@ -71,15 +72,8 @@ namespace mpmt
    {
 
       static_assert(!std::is_same_v<DT, ring1>, "rng_openssl<DT>::rand(const DT lb, const DT ub) does not support ring1.");
-      if (lb > ub)
-      {
-         throw rng_openssl_exc
-         (
-            "Lower bound (LB) is greater than upper bound (UB).",
-            rng_openssl_exc::error_code::INVALID_INPUT
-         );
-      }
-
+      MPMT_ASSERT(lb <= ub, "invalid input, lower bound (LB) is greater than upper bound (UB).");
+   
       const DT maxv = std::numeric_limits<DT>::max();
       if (ub == maxv && lb == 0)
       {
@@ -112,7 +106,7 @@ namespace mpmt
    {
       rng_openssl<DT>::rcontainer result;
 
-      return std::move(result);  // 移动语义
+      return result;  // 移动语义
    }
 
    template <typename DT>

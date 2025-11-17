@@ -1,5 +1,4 @@
 #include "core/ring/rvector.hpp"
-#include "core/exception/std_exc.hpp"
 
 template<typename RT>
 mpmt::rvector<RT>::rvector() :
