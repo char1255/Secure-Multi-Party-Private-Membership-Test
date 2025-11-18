@@ -1,6 +1,6 @@
 #ifndef MRVF_HANDLER_TPP
 #define MRVF_HANDLER_TPP
-
+#include "core/mpmtcfg.hpp"
 #include "core/ring/mrvf/mrvf_handler.hpp"
 
 namespace mpmt
@@ -8,10 +8,28 @@ namespace mpmt
     template<typename T>
     mrvf_handler<T>::mrvf_handler
     (
-        const std::string& load_path
+        const std::string& load_path,
+        bool use_memory_mapping
     ) :
-        m_use_memory_map(use_memory_map)
+        m_is_checked_out(false),            // 初始化状态下，缓存未被借出
+        m_use_memory_map(use_memory_map)    // 是否使用内存映射
     {
+        if(use_memory_mapping)
+        {
+        #ifdef MPMT_OS_WIN
+        #elif MPMT_OS_IOS
+            #error "No immediate plan."
+        #elif MPMT_OS_MACOS
+            #error "Coming soon."
+        #elif MPMT_OS_ANDROID
+            #error "No immediate plan."
+        #elif MPMT_OS_HARMONY
+            #error "No immediate plan."
+        #elif MPMT_OS_LINUX
+            #error "Coming soon."
+        #endif 
+        }
+
         // RAII 文件配置
         std::ifstream in_file(load_path, std::ios::binary);
         if (!in_file)
@@ -192,64 +210,24 @@ namespace mpmt
     }
 
     template<typename T>
-    mrvf_handler<T>::~mrvf_handler()
-    {}
-
-    template<typename T>
-    mrvf_handler<T>::const_iterator::const_iterator() : current_ptr(nullptr) {}
-
-    template<typename T>
-    mrvf_handler<T>::const_iterator::const_iterator(const T* ptr) : current_ptr(ptr) {}
-
-    template<typename T>
-    mrvf_handler<T>::const_iterator::reference mrvf_handler<T>::const_iterator::operator*() const
-    {
-        return *current_ptr;
+    mrvf_handler<T>::~mrvf_handler(){
+        MPMT_ASSERT(!m_is_checked_out, "对于对象 rvector buffer 使用权并未归还。")
     }
 
     template<typename T>
-    mrvf_handler<T>::const_iterator::pointer mrvf_handler<T>::const_iterator::operator->() const
-    {
-        return current_ptr;
+    T* mrvf_handler<T>::rvector_buffer_check_out(){
+        m_is_checked_out = true;
+        return m_rvector_buffer.release();
     }
 
     template<typename T>
-    mrvf_handler<T>::const_iterator& mrvf_handler<T>::const_iterator::operator++()
-    {
-        ++current_ptr;
-        return *this;
+    void mrvf_handler<T>::rvector_buffer_check_in(T* const buffer){
+        m_rvector_buffer.reset(buffer);
+        m_is_checked_out = false;
     }
 
-    template<typename T>
-    mrvf_handler<T>::const_iterator mrvf_handler<T>::const_iterator::operator++(int)
-    {
-        const_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
 
-    template<typename T>
-    bool operator==
-    (
-        const typename mrvf_handler<T>::const_iterator& a,
-        const typename mrvf_handler<T>::const_iterator& b
-    )
-    {
-        return a.current_ptr == b.current_ptr;
-    }
 
-    template<typename T>
-    bool operator!=
-    (
-        const typename mrvf_handler<T>::const_iterator& a,
-        const typename mrvf_handler<T>::const_iterator& b
-    )
-    {
-        return !(a == b);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    //  还需要对 T==ring1 进行特化实现
 
 }
 #endif // !MRVF_HANDLER_TPP

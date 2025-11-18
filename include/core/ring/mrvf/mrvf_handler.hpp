@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "core/ring/ring.hpp"
+#include "core/ring/rvector.hpp"
 #include "core/exception/mrvf_exc.hpp"
 #include "core/crc/crc64.hpp"
 #include "core/crc/crc64_ecma182.hpp"
@@ -17,6 +18,9 @@ namespace mpmt
     class mrvf_handler
     {
     public:
+        /** @brief 声明rvector为友元类 */
+        friend class rvector<T>;
+
         /** @brief 断言限制模板类型 */
         static_assert(
             std::is_same_v<T, ring1> ||
@@ -28,7 +32,11 @@ namespace mpmt
             );
 
         /** @brief 唯一允许的构造函数 */
-        explicit mrvf_handler(const std::string& load_path);
+        explicit mrvf_handler
+        (
+            const std::string& load_path, 
+            bool use_memory_mapping = false
+        );
 
         /** @brief 保存函数 */
         void save(const std::string& save_path);
@@ -36,61 +44,32 @@ namespace mpmt
         /** @brief 析构函数 */
         ~mrvf_handler();
 
-        /** @brief 暴露只读迭代器接口 */
-        class const_iterator
-        {
-        public:
-            using iterator_category = std::input_iterator_tag;
-            using value_type = T;
-            using difference_type = std::ptrdiff_t;
-            using pointer = const T*;
-            using reference = const T&;
-
-        private:
-            const T* cur_ptr;   // 当前指针
-
-            // 默认构造函数
-            const_iterator();
-
-            // 初始化构造函数
-            explicit const_iterator(const T* ptr) : current_ptr(ptr) {}
-
-            // 解引用操作符 (*iter) -> 只读
-            reference operator*() const;
-
-            // 成员访问操作符 (iter->member) -> 只读
-            pointer operator->() const;
-
-            // 前置递增 (++iter)
-            const_iterator& operator++();
-
-            // 后置递增 (iter++)
-            // C++17 InputIterator 只需要单通道性，但为了语义还是实现它
-            const_iterator operator++(int)
-            {
-                const_iterator tmp = *this;
-                ++(*this);
-                return tmp;
-            }
-
-            // 相等操作符
-            friend bool operator==(const const_iterator& a, const const_iterator& b);
-
-            // 不等操作符
-            friend bool operator!=(const const_iterator& a, const const_iterator& b);
-        };
+    protected:
+        /** @brief 友元类可以申请对向量缓存区的读写权限 */
+        T* rvector_buffer_check_out();                                  // 将向量缓存区的读写权限签发
+        void rvector_buffer_check_in(T* const buffer);                  // 收回向量缓存区的读写权限
 
     private:
+        /** @brief member variable */
+        bool m_is_checked_out;                                          // 
         const bool m_use_memory_map;                                    // 是否使用内存映像
         uint8_t m_version;                                              // 文件版本号
         uint8_t m_ring_size;                                            // 环大小：环位宽
         uint32_t m_rvector_size;                                        // 向量大小：m_rvector_size * sizeof(T) (bytes)
-        T* const m_file_buffer;                                         // 文件指针
+        std::unique_ptr<T[]> m_rvector_buffer;                          // 向量缓存指针
 
-        /** @brief constant */
-        static inline constexpr uint64_t M_BOF = 0x4D5256465F424F46;    // 文件头-标识"MRVF_BOF"
-        static inline constexpr uint64_t M_EOF = 0x4D5256465F454F46;    // 文件尾-标识"MRVF_EOF"
-        static inline constexpr std::string M_FILE_EXTENSION = ".mrvf"; // 文件t拓展名
+        /** @brief mrcf file format size */
+        static constexpr size_t M_BOF_LEN = 8;                          // 文件头长度
+        static constexpr size_t M_VERSION_LEN = 1;                      // 版本号字段长度
+        static constexpr size_t M_RING_SIZE_LEN = 1;                    // 环大小字段长度
+        static constexpr size_t M_RVECTOR_SIZE_LEN = 4;                 // 向量大小字段长度
+        static constexpr size_t M_CRC64_LEN = 8;                        // CRC64字段长度
+        static constexpr size_t M_EOF_LEN = 8;                          // 文件尾长度
+
+        /** @brief constant value */
+        static constexpr uint64_t M_BOF = 0x4D5256465F424F46;           // 文件头-标识"MRVF_BOF"
+        static constexpr uint64_t M_EOF = 0x4D5256465F454F46;           // 文件尾-标识"MRVF_EOF"
+        static constexpr std::string M_FILE_EXTENSION = ".mrvf";        // 文件拓展名
 
         /** @brief 禁用拷贝与移动操作 */
         mrvf_handler() = delete;                                        // 禁止默认构造
