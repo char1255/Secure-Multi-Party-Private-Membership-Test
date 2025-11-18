@@ -6,176 +6,175 @@
 namespace mpmt
 {
     template<typename T>
-    mrvf_handler<T>::mrvf_handler(
-        const std::string& load_path,
-        const bool use_memory_mapping
+    mrvf_handler<T>::mrvf_handler
+    (
+        const std::string& load_path
     ) :
-        m_use_memory_mapping(use_memory_mapping)
+        m_use_memory_map(use_memory_map)
     {
-        // 使用内存映像
-        if (m_use_memory_mapping)
+        // RAII 文件配置
+        std::ifstream in_file(load_path, std::ios::binary);
+        if (!in_file)
         {
-#ifdef defined(MPMT_OS_WIN)
-
-#elif defined(MPMT_OS_IOS)
-
-#elif defined(MPMT_OS_MACOS)
-
-#elif defined(MPMT_OS_ANDROID)
-
-#elif defined(MPMT_OS_LINUX)
-
-#endif 
+            throw mpmt::mrvf_exc
+            (
+                mrvf_exc::error_type::FILE_OPEN_ERROR,
+                "Can not open file [" + load_path + "]"
+            );
         }
-        // 常规文件读取 
+
+        // 读取文件头
+        uint64_t fBOF;              // 文件头magic number
+        uint64_t reversed_fBOF;     // 调整端序后的文件头
+        bool is_little_endian;      // 判断当前系统为大端还是小端
+        in_file.read(reinterpret_cast<char*>(&fBOF), sizeof(uint64_t));
+        reversed_fBOF = swap_endian<uint64_t>(fBOF);
+        if (fBOF == this->M_BOF)
+        {
+            // 文件默认为小端，则系统为小端
+            is_little_endian = true;
+        }
+        else if (reversed_fBOF == this->M_BOF)
+        {
+            // 文件默认为小端，则系统为大端
+            is_little_endian = false;
+        }
         else
         {
-/////////////////////////////////////////////////////////////////////////////////////////////////
-//          首要工作任务！！！！！！！！！将整个完整读入，而非分段seek，非数据段一共也才三十几个字节，无所谓的
-/////////////////////////////////////////////////////////////////////////////////////////////////
+            // 文件头不匹配，抛出错误
+            throw mpmt::mrvf_exc
+            (
+                mrvf_exc::error_type::FILE_INVALID_BOF,
+                "Invalid file header (BOF) [" + load_path + "]"
+            )
+        }
 
-            // RAII 文件配置
-            std::ifstream in_file(load_path, std::ios::binary);
-            if (!in_file)
-            {
-                throw mpmt::mrvf_exc
-                (
-                    mrvf_exc::error_type::FILE_OPEN_ERROR,
-                    "Can not open file [" + load_path + "]"
-                );
-            }
+        // 读取版本
+        size_t offset = 8;  // 文件指针指向'version'字段
+        in_file.seekg(offset);
+        if (!in_file)
+        {
+            throw mpmt::mrvf_exc
+            (
+                mrvf_exc::error_type::FILE_SEEK_ERROR,
+                "Can not seek file ["
+                + load_path
+                + "] at offset="
+                + std::to_string((offset))
+                + "."
+            );
+        }
+        in_file.read(reinterpret_cast<char*>(&m_version), sizeof(uint8_t));
 
-            // 读取文件头
-            uint64_t fBOF;             // 文件头magic number
-            uint64_t reversed_fBOF;    // 调整端序后的文件头
-            bool is_little_endian;      // 判断当前系统为大端还是小端
-            in_file.read(reinterpret_cast<char*>(&fBOF), sizeof(uint64_t));
-            reversed_fBOF = swap_endian<uint64_t>(fBOF);
-            if (fBOF == this->M_BOF)
-            {
-                // 文件默认为小端，则系统为小端
-                is_little_endian = true;
-            }
-            else if (reversed_fBOF == this->M_BOF)
-            {
-                // 文件默认为小端，则系统为大端
-                is_little_endian = false;
-            }
-            else
-            {
-                // 文件头不匹配，抛出错误
-                throw mpmt::mrvf_exc
-                (
-                    mrvf_exc::error_type::FILE_INVALID_BOF,
-                    "Invalid file header (BOF) [" + load_path + "]"
-                )
-            }
+        // 读取环大小
+        uint8_t m_ring_size;
+        offset += 1; // 文件指针指向 'ring_size'字段 
+        in_file.seekg(offset);
+        if (!in_file)
+        {
+            throw mpmt::mrvf_exc
+            (
+                mrvf_exc::error_type::FILE_SEEK_ERROR,
+                "Can not seek file ["
+                + load_path
+                + "] at offset="
+                + std::to_string((offset))
+                + "."
+            );
+        }
+        in_file.read(reinterpret_cast<char*>(&m_ring_size), sizeof(uint8_t));
+        if (m_ring_size != sizeof(T))
+        {
+            throw mpmt::mrvf_exc
+            (
+                mrvf_exc::error_type::FILE_RING_SIZE_MISMATCH,
+                "File [" + load_path
+                + "] specifies a ring \mathbb{Z}_{2^"
+                + std::to_string(m_ring_size) +
+                "} and cannot be loaded via mrvf_handler<ring"
+                + std::to_string(8 * sizeof(T))
+                + ">."
+            );
+        }
 
-            // 读取版本
-            in_file.seekg(8);
-            if (!in_file)
-            {
-                throw mpmt::mrvf_exc
-                (
-                    mrvf_exc::error_type::FILE_SEEK_ERROR,
-                    "Can not seek file [" + load_path + "] at offset=8."
-                );
-            }
-            in_file.read(reinterpret_cast<char*>(&m_version), sizeof(uint8_t));
+        // 读取向量大小
+        offset += 1; // 文件指针指向 'rvector_size'字段 
+        in_file.seekg(offset);
+        if (!in_file)
+        {
+            throw mpmt::mrvf_exc
+            (
+                mrvf_exc::error_type::FILE_SEEK_ERROR,
+                "Can not seek file ["
+                + load_path
+                + "] at offset="
+                + std::to_string((offset))
+                + "."
+            );
+        }
+        in_file.read(reinterpret_cast<char*>(&m_rvector_size), sizeof(uint32_t));
 
-            // 读取环大小
-            uint8_t m_ring_size;
-            in_file.seekg(1);
-            if (!in_file)
+        // 读取向量
+        offset += 4; // 文件指针指向 'rvector_segment'字段 
+        in_file.seekg(offset);
+        m_rvector_buf = std::make_unique<T[]>(m_rvector_size);
+        in_file.read(reinterpret_cast<char*>(m_rvector_buf.get()), m_rvector_size * sizeof(T));
+        if (!is_little_endian)  // 如果是大端序，则调整向量的端序
+        {
+            /**
+             * 这里其实考虑：如果端序调整的开销过高，则需要在文件中标注端序，文件跨系统运行时，
+             * 需要检测计算机端序，并调整文件端序，此后便无需调整。
+             * 这里暂时先默认文件为小端序写入的，等后面profiling一下调整端序的开销
+             */
+            for (size_t i = 0;i < m_rvector_size;++i)
             {
-                throw mpmt::mrvf_exc
-                (
-                    mrvf_exc::error_type::FILE_SEEK_ERROR,
-                    "Can not seek file [" + load_path + "] at offset=9."
-                );
-            }
-            in_file.read(reinterpret_cast<char*>(&m_ring_size), sizeof(uint8_t));
-            if (m_ring_size != sizeof(T))
-            {
-                throw mpmt::mrvf_exc
-                (
-                    mrvf_exc::error_type::FILE_RING_SIZE_MISMATCH,
-                    "File [" + load_path
-                    + "] specifies a ring \mathbb{Z}_{2^"
-                    + std::to_string(m_ring_size) +
-                    "} and cannot be loaded via mrvf_handler<ring"
-                    + std::to_string(8 * sizeof(T))
-                    + ">."
-                );
-            }
-
-            // 读取向量大小
-            in_file.seekg(1);
-            if (!in_file)
-            {
-                throw mpmt::mrvf_exc
-                (
-                    mrvf_exc::error_type::FILE_SEEK_ERROR,
-                    "Can not seek file [" + load_path + "] at offset=10."
-                );
-            }
-            in_file.read(reinterpret_cast<char*>(&m_rvector_size), sizeof(uint64_t));
-
-            // 读取向量
-            m_rvector_buf = std::make_unique<T[]>(m_rvector_size);
-            in_file.read(reinterpret_cast<char*>(m_rvector_buf.get()), m_rvector_size * sizeof(T));
-            if (!is_little_endian)  // 如果是大端序，则调整向量的端序
-            {
-                /**
-                 * 这里其实考虑：如果端序调整的开销过高，则需要在文件中标注端序，文件跨系统运行时，
-                 * 需要检测计算机端序，并调整文件端序，此后便无需调整。
-                 * 这里暂时先默认文件为小端序写入的，等后面profiling一下调整端序的开销
-                 */
-                for (size_t i = 0;i < m_rvector_size;++i)
-                {
-                    swap_endian<T>(m_rvector_buf[i]);
-                }
-            }
-
-            // 读取CRC
-            uint64_t expected_crc64;   // 从文件中读出来的crc值
-            uint64_t computed_crc64;   // 校验计算得到的crc值
-            in_file.seekg(m_ring_size * sizeof(T));
-            if (!in_file)
-            {
-                throw mpmt::mrvf_exc
-                (
-                    mrvf_exc::error_type::FILE_SEEK_ERROR,
-                    "Can not seek file [" + load_path + "] at offset="
-                    + std::to_string(10 + m_ring_size * sizeof(T)) + "."
-                );
-            }
-            in_file.read(reinterpret_cast<char*>(&expected_crc64), sizeof(uint64_t));
-
-            // 实例化CRC计算接口，并计算CRC64校验值
-            std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
-
-            // ...待实现计算校验
-            // ... 
-
-            // 读入文件尾
-            uint64_t fEOF;             // 文件尾magic number
-            in_file.seekg(1);
-            in_file.read(reinterpret_cast<char*>(&fEOF), sizeof(uint64_t));
-            if (!is_little_endian)
-            {
-                swap_endian<uint64_t>(fEOF);
-            }
-            if(fEOF != this->M_EOF){  // 文件尾不匹配，抛出错误
-                throw mpmt::mrvf_exc
-                (
-                    mrvf_exc::error_type::FILE_INVALID_EOF,
-                    "Invalid file footer (EOF) [" + load_path + "]"
-                )
+                swap_endian<T>(m_rvector_buf[i]);
             }
         }
-    }
 
+        // 读取CRC
+        uint64_t expected_crc64;   // 从文件中读出来的crc值
+        uint64_t computed_crc64;   // 校验计算得到的crc值
+        offset += m_rvector_size * sizeof(T);   // 指针指向文件校验码
+        in_file.seekg(offset);
+        if (!in_file)
+        {
+            throw mpmt::mrvf_exc
+            (
+                mrvf_exc::error_type::FILE_SEEK_ERROR,
+                "Can not seek file ["
+                + load_path
+                + "] at offset="
+                + std::to_string(offset)
+                + "."
+            );
+        }
+        in_file.read(reinterpret_cast<char*>(&expected_crc64), sizeof(uint64_t));
+
+        // 实例化CRC计算接口，并计算CRC64校验值
+        std::unique_ptr<mpmt::crc64> crc = std::make_unique<mpmt::crc64_ecma182>();
+
+        // ...待实现计算校验
+        // ... 
+
+        // 读入文件尾
+        uint64_t fEOF;  // 文件尾magic number
+        offset += 8;    // 指向文件尾
+        in_file.seekg(1);
+        in_file.read(reinterpret_cast<char*>(&fEOF), sizeof(uint64_t));
+        if (!is_little_endian)
+        {
+            swap_endian<uint64_t>(fEOF);
+        }
+        if (fEOF != this->M_EOF)
+        {  // 文件尾不匹配，抛出错误
+            throw mpmt::mrvf_exc
+            (
+                mrvf_exc::error_type::FILE_INVALID_EOF,
+                "Invalid file footer (EOF) [" + load_path + "]"
+            )
+        }
+    }
 
     template<typename T>
     void mrvf_handler<T>::save(const std::string& save_path)
@@ -193,11 +192,61 @@ namespace mpmt
     }
 
     template<typename T>
-    std::unique_ptr<T[]>  mrvf_handler<T>::release_buffer()
+    mrvf_handler<T>::~mrvf_handler()
+    {}
+
+    template<typename T>
+    mrvf_handler<T>::const_iterator::const_iterator() : current_ptr(nullptr) {}
+
+    template<typename T>
+    mrvf_handler<T>::const_iterator::const_iterator(const T* ptr) : current_ptr(ptr) {}
+
+    template<typename T>
+    mrvf_handler<T>::const_iterator::reference mrvf_handler<T>::const_iterator::operator*() const
     {
-        return std::move(this->m_rvector_buf);
+        return *current_ptr;
     }
 
+    template<typename T>
+    mrvf_handler<T>::const_iterator::pointer mrvf_handler<T>::const_iterator::operator->() const
+    {
+        return current_ptr;
+    }
+
+    template<typename T>
+    mrvf_handler<T>::const_iterator& mrvf_handler<T>::const_iterator::operator++()
+    {
+        ++current_ptr;
+        return *this;
+    }
+
+    template<typename T>
+    mrvf_handler<T>::const_iterator mrvf_handler<T>::const_iterator::operator++(int)
+    {
+        const_iterator tmp = *this;
+        ++(*this);
+        return tmp;
+    }
+
+    template<typename T>
+    bool operator==
+    (
+        const typename mrvf_handler<T>::const_iterator& a,
+        const typename mrvf_handler<T>::const_iterator& b
+    )
+    {
+        return a.current_ptr == b.current_ptr;
+    }
+
+    template<typename T>
+    bool operator!=
+    (
+        const typename mrvf_handler<T>::const_iterator& a,
+        const typename mrvf_handler<T>::const_iterator& b
+    )
+    {
+        return !(a == b);
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     //  还需要对 T==ring1 进行特化实现

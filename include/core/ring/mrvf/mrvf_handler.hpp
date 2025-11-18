@@ -10,30 +10,6 @@
 #include "core/crc/crc64.hpp"
 #include "core/crc/crc64_ecma182.hpp"
 
-template<typename T>
-static inline T swap_endian(T val)
-{
-    static_assert(
-        std::is_same_v<T, uint16_t> ||
-        std::is_same_v<T, uint32_t> ||
-        std::is_same_v<T, uint64_t>,
-        "T must be uint16_t, uint32_t, or uint64_t."
-        );
-
-    if constexpr (std::is_same_v<T, uint16_t>)
-    {
-        return __builtin_bswap16(val);
-    }
-    else if constexpr (std::is_same_v<T, uint32_t>)
-    {
-        return __builtin_bswap32(val);
-    }
-    else
-    {
-        return __builtin_bswap64(val);
-    }
-}
-
 /** @namespace 项目命名空间 */
 namespace mpmt
 {
@@ -48,32 +24,68 @@ namespace mpmt
             std::is_same_v<T, ring16> ||
             std::is_same_v<T, ring32> ||
             std::is_same_v<T, ring64>,
-            "T must be ring1, ring8, ring16, ring32, or ring64."
+            "T must be ring1, ring8, ring16, ring32 or ring64."
             );
 
         /** @brief 唯一允许的构造函数 */
-        explicit mrvf_handler
-        (
-            const std::string& load_path,
-            const bool use_memory_mapping = false
-        );
+        explicit mrvf_handler(const std::string& load_path);
 
         /** @brief 保存函数 */
         void save(const std::string& save_path);
 
-        /** @brief 转义所有权 */
-        std::unique_ptr<T[]> release_buffer();
-
         /** @brief 析构函数 */
         ~mrvf_handler();
 
+        /** @brief 暴露只读迭代器接口 */
+        class const_iterator
+        {
+        public:
+            using iterator_category = std::input_iterator_tag;
+            using value_type = T;
+            using difference_type = std::ptrdiff_t;
+            using pointer = const T*;
+            using reference = const T&;
+
+        private:
+            const T* cur_ptr;   // 当前指针
+
+            // 默认构造函数
+            const_iterator();
+
+            // 初始化构造函数
+            explicit const_iterator(const T* ptr) : current_ptr(ptr) {}
+
+            // 解引用操作符 (*iter) -> 只读
+            reference operator*() const;
+
+            // 成员访问操作符 (iter->member) -> 只读
+            pointer operator->() const;
+
+            // 前置递增 (++iter)
+            const_iterator& operator++();
+
+            // 后置递增 (iter++)
+            // C++17 InputIterator 只需要单通道性，但为了语义还是实现它
+            const_iterator operator++(int)
+            {
+                const_iterator tmp = *this;
+                ++(*this);
+                return tmp;
+            }
+
+            // 相等操作符
+            friend bool operator==(const const_iterator& a, const const_iterator& b);
+
+            // 不等操作符
+            friend bool operator!=(const const_iterator& a, const const_iterator& b);
+        };
 
     private:
-        const bool m_use_memory_mapping;                                // 是否使用内存映像
-        uint8_t m_version;
+        const bool m_use_memory_map;                                    // 是否使用内存映像
+        uint8_t m_version;                                              // 文件版本号
         uint8_t m_ring_size;                                            // 环大小：环位宽
-        uint64_t m_rvector_size;                                        // 向量大小：m_rvector_size * sizeof(T) (bytes)
-        std::unique_ptr<T[]> m_rvector_buf;                             // 数据载荷段
+        uint32_t m_rvector_size;                                        // 向量大小：m_rvector_size * sizeof(T) (bytes)
+        T* const m_file_buffer;                                         // 文件指针
 
         /** @brief constant */
         static inline constexpr uint64_t M_BOF = 0x4D5256465F424F46;    // 文件头-标识"MRVF_BOF"
@@ -81,11 +93,25 @@ namespace mpmt
         static inline constexpr std::string M_FILE_EXTENSION = ".mrvf"; // 文件t拓展名
 
         /** @brief 禁用拷贝与移动操作 */
-        mrvf_handler() = delete;                                    // 禁止默认构造
-        mrvf_handler(const mrvf_handler&) = delete;                 // 禁止拷贝构造
-        mrvf_handler(mrvf_handler&&) = delete;                      // 禁止移动构造
-        mrvf_handler& operator=(const mrvf_handler&) = delete;      // 禁止拷贝赋值
-        mrvf_handler& operator=(mrvf_handler&&) = delete;           // 禁止移动赋值
+        mrvf_handler() = delete;                                        // 禁止默认构造
+        mrvf_handler(const mrvf_handler&) = delete;                     // 禁止拷贝构造
+        mrvf_handler(mrvf_handler&&) = delete;                          // 禁止移动构造
+        mrvf_handler& operator=(const mrvf_handler&) = delete;          // 禁止拷贝赋值
+        mrvf_handler& operator=(mrvf_handler&&) = delete;               // 禁止移动赋值
+
+    };
+
+    template<>
+    class mrvf_handler<ring1>
+    {
+        /** @brief 唯一允许的构造函数 */
+        explicit mrvf_handler(const std::string& load_path);
+
+        /** @brief 保存函数 */
+        void save(const std::string& save_path);
+
+        /** @brief 析构函数 */
+        ~mrvf_handler();
     };
 }
 
