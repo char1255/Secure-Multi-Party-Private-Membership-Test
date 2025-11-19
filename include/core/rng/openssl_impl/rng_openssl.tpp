@@ -72,6 +72,7 @@ namespace mpmt
    {
 
       static_assert(!std::is_same_v<DT, ring1>, "rng_openssl<DT>::rand(const DT lb, const DT ub) does not support ring1.");
+      
       MPMT_ASSERT(lb <= ub, "invalid input, lower bound (LB) is greater than upper bound (UB).");
    
       const DT maxv = std::numeric_limits<DT>::max();

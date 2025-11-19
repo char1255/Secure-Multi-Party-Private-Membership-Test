@@ -41,11 +41,12 @@
 #endif
 
 
+// 后续更新堆栈打印工具，并通过日志系统更新到日志内容中
 #define MPMT_ASSERT(cond, msg)                                          \
 		do {                                                            \
 			if (!(cond)) {                                             	\
 				fprintf(stderr,                                         \
-					"\033[1;31m[错误]\033[0m\n"						    \
+					"\033[1;31m[ERROR]\033[0m\n"						\
 					"  Condition : %s\n"                                \
 					"  Message   : %s\n"                                \
 					"  Function  : %s\n"                                \
@@ -56,6 +57,20 @@
 			}                                                           \
 		} while(0)
 
+// 后续更新日志系统，让WARN的内容更新到日志内容中
+#define MPMT_WARN(cond, msg)                                           	\
+        do {                                                            \
+            if (!(cond)) {                                              \
+                fprintf(stderr,                                         \
+                    "\033[1;33m[WARN]\033[0m\n"                         \
+                    "  Condition : %s\n"                                \
+                    "  Message   : %s\n"                                \
+                    "  Function  : %s\n"                                \
+                    "  File      : %s\n"                                \
+                    "  Line      : %d\n",                               \
+                    #cond, msg, __func__, __FILE__, __LINE__);          \
+            }                                                           \
+        } while(0)
         
 /** @namespace 项目命名空间。*/
 namespace mpmt{

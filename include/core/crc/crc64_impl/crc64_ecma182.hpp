@@ -1,9 +1,8 @@
-#ifndef crc64_ecma182_HPP
-#define crc64_ecma182_HPP
+#ifndef CRC64_ECMA_182_HPP
+#define CRC64_ECMA_182_HPP
 
 #include <cstdint>
 #include <vector>
-#include "core/ring/ring.hpp"
 #include "core/crc/crc64.hpp"
 
 /** @namespace 项目命名空间 */
@@ -87,4 +86,4 @@ namespace mpmt
 
     };
 }
-#endif // !crc64_ecma182_HPP
+#endif // !CRC64_ECMA_182_HPP
