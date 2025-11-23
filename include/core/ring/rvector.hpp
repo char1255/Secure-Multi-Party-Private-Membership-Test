@@ -20,11 +20,7 @@ namespace mpmt
     public:
         /** @brief 断言限制模板类型 */
         static_assert(
-            std::is_same_v<RT, ring1> ||
-            std::is_same_v<RT, ring8> ||
-            std::is_same_v<RT, ring16> ||
-            std::is_same_v<RT, ring32> ||
-            std::is_same_v<RT, ring64>,
+            is_ring_type,
             "RT must be ring1, ring8, ring16, ring32, or ring64."
             );
 

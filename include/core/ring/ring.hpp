@@ -62,34 +62,46 @@ namespace mpmt
     using ring64 = uint64_t;
 
     template <typename RT>
-    inline RT boolean_to_arithmetic()
+    inline RT boolean_to_arithmetic(const ring1 x)
     {
         static_assert(
-            std::is_same_v<RT, ring1> ||
-            std::is_same_v<RT, ring8> ||
-            std::is_same_v<RT, ring16> ||
-            std::is_same_v<RT, ring32> ||
-            std::is_same_v<RT, ring64>,
-            "RT must be ring1, ring8, ring16, ring32, or ring64."
+            is_ring_type && !std::is_same_v<RT, ring1>,
+            "RT must be ring8, ring16, ring32, or ring64."
             );
 
         return RT(); // TO BE UPDATED
+    }
+
+    template <typename RT>
+    inline ring1 arithmetic_to_boolean(const RT x)
+    {
+        static_assert(
+            is_ring_type && !std::is_same_v<RT, ring1>,
+            "RT must be ring8, ring16, ring32, or ring64."
+            );
+
+        return ring1(); // TO BE UPDATED
     }
 
     template<typename RT>
     RT ring1::fill_bits()
     {
         static_assert(
-            std::is_same_v<RT, ring8> ||
-            std::is_same_v<RT, ring16> ||
-            std::is_same_v<RT, ring32> ||
-            std::is_same_v<RT, ring64>,
+            is_ring_type && !std::is_same_v<RT, ring1>,
             "RT must be ring8, ring16, ring32, or ring64."
             );
 
         RT data = static_cast<RT>(0);
         return (m_v == 0) ? data : ~data;
     }
+
+    template<typename RT>
+    constexpr bool is_ring_type =
+        std::is_same_v<RT, ring1>   ||
+        std::is_same_v<RT, ring8>   ||
+        std::is_same_v<RT, ring16>  ||
+        std::is_same_v<RT, ring32>  ||
+        std::is_same_v<RT, ring64>;
 
 }
 #endif // !RING_HPP
