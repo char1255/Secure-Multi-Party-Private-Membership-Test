@@ -2,14 +2,14 @@
 
 template<typename RT>
 mpmt::rvector<RT>::rvector() :
-    m_data_(nullptr),
-    m_size_(0)
+    m_data(nullptr),
+    m_size(0)
 {}
 
 template<typename RT>
 mpmt::rvector<RT>::rvector(size_t n) :
-    m_size_(n),
-    m_data_(std::make_unique<RT[]>(n))
+    m_size(n),
+    m_data(std::make_unique<RT[]>(n))
 {}
 
 template<typename RT>
@@ -19,30 +19,30 @@ mpmt::rvector<RT>::rvector
     const RT value
 ) : rvector(n)
 {
-    std::fill(m_data_.get(), m_data_.get() + m_size_, value);
+    std::fill(m_data.get(), m_data.get() + m_size, value);
 }
 
 template<typename RT>
 mpmt::rvector<RT>::rvector(const std::vector<RT>& list)
     : rvector(list.size())
 {
-    std::copy(list.begin(), list.end(), m_data_.get());
+    std::copy(list.begin(), list.end(), m_data.get());
 }
 
 template <typename RT>
 mpmt::rvector<RT>::rvector(const rvector& other)
     :
-    rvector(other.m_size_)
+    rvector(other.m_size)
 {
-    std::copy(other.m_data_.get(), other.m_data_.get() + m_size_, m_data_.get());
+    std::copy(other.m_data.get(), other.m_data.get() + m_size, m_data.get());
 }
 
 template<typename RT>
 mpmt::rvector<RT>::rvector(rvector&& other) noexcept
-    : m_data_(std::move(other.m_data_)), m_size_(other.m_size_)
+    : m_data(std::move(other.m_data)), m_size(other.m_size)
 {
-    other.m_data_ = nullptr;
-    other.m_size_ = 0;
+    other.m_data = nullptr;
+    other.m_size = 0;
 }
 
 template <typename RT>
@@ -50,15 +50,15 @@ mpmt::rvector<RT>& mpmt::rvector<RT>::operator=(const rvector<RT>& other)
 {
     if (this != &other)
     {
-        if (m_size_ != other.m_size_)
+        if (m_size != other.m_size)
         {
             rvector<RT> temp(other);
-            std::swap(this->m_data_, temp.m_data_);
-            std::swap(this->m_size_, temp.m_size_);
+            std::swap(this->m_data, temp.m_data);
+            std::swap(this->m_size, temp.m_size);
         }
         else
         {
-            std::copy(other.m_data_.get(), other.m_data_.get() + m_size_, m_data_.get());
+            std::copy(other.m_data.get(), other.m_data.get() + m_size, m_data.get());
         }
     }
     return *this;
@@ -67,25 +67,25 @@ mpmt::rvector<RT>& mpmt::rvector<RT>::operator=(const rvector<RT>& other)
 template<typename RT>
 RT& mpmt::rvector<RT>::operator[](size_t index)
 {
-    MPMT_ASSERT(index < m_size_, "Vector dimension mismatch for multiplication.");
-    return m_data_[index];
+    MPMT_ASSERT(index < m_size, "Vector dimension mismatch for multiplication.");
+    return m_data[index];
 }
 
 template<typename RT>
 const RT& mpmt::rvector<RT>::operator[](size_t index) const
 {
-    MPMT_ASSERT(index < m_size_, "Vector dimension mismatch for multiplication.");
-    return m_data_[index];
+    MPMT_ASSERT(index < m_size, "Vector dimension mismatch for multiplication.");
+    return m_data[index];
 }
 
 template<typename RT>
 mpmt::rvector<RT>& mpmt::rvector<RT>::operator+=(const rvector<RT>& other)
 {
-    MPMT_ASSERT(m_size_ == other.m_size_, "Vector dimension mismatch for addition.");
+    MPMT_ASSERT(m_size == other.m_size, "Vector dimension mismatch for addition.");
 
-    for (size_t i = 0;i < m_size_;++i)
+    for (size_t i = 0;i < m_size;++i)
     {
-        m_data_[i] += other[i];
+        m_data[i] += other[i];
     }
 
     return *this;
@@ -94,9 +94,9 @@ mpmt::rvector<RT>& mpmt::rvector<RT>::operator+=(const rvector<RT>& other)
 template<typename RT>
 mpmt::rvector<RT>& mpmt::rvector<RT>::operator+=(const RT scalar)
 {
-    for (size_t i = 0;i < m_size_;++i)
+    for (size_t i = 0;i < m_size;++i)
     {
-        m_data_[i] += scalar;
+        m_data[i] += scalar;
     }
 
     return *this;
@@ -105,10 +105,10 @@ mpmt::rvector<RT>& mpmt::rvector<RT>::operator+=(const RT scalar)
 template<typename RT>
 mpmt::rvector<RT>& mpmt::rvector<RT>::operator-=(const rvector<RT>& other)
 {
-    MPMT_ASSERT(m_size_ == other.m_size_, "Vector dimension mismatch for subtraction.");
-    for (size_t i = 0;i < m_size_;++i)
+    MPMT_ASSERT(m_size == other.m_size, "Vector dimension mismatch for subtraction.");
+    for (size_t i = 0;i < m_size;++i)
     {
-        m_data_[i] -= other[i];
+        m_data[i] -= other[i];
     }
 
     return *this;
@@ -117,9 +117,9 @@ mpmt::rvector<RT>& mpmt::rvector<RT>::operator-=(const rvector<RT>& other)
 template<typename RT>
 mpmt::rvector<RT>& mpmt::rvector<RT>::operator-=(const RT scalar)
 {
-    for (size_t i = 0;i < m_size_;++i)
+    for (size_t i = 0;i < m_size;++i)
     {
-        m_data_[i] -= scalar;
+        m_data[i] -= scalar;
     }
 
     return *this;
@@ -128,10 +128,10 @@ mpmt::rvector<RT>& mpmt::rvector<RT>::operator-=(const RT scalar)
 template<typename RT>
 mpmt::rvector<RT>& mpmt::rvector<RT>::operator*=(const rvector<RT>& other)
 {
-    MPMT_ASSERT(m_size_ == other.m_size_, "Vector dimension mismatch for multiplication.");
-    for (size_t i = 0;i < m_size_;++i)
+    MPMT_ASSERT(m_size == other.m_size, "Vector dimension mismatch for multiplication.");
+    for (size_t i = 0;i < m_size;++i)
     {
-        m_data_[i] *= other[i];
+        m_data[i] *= other[i];
     }
 
     return *this;
@@ -140,9 +140,9 @@ mpmt::rvector<RT>& mpmt::rvector<RT>::operator*=(const rvector<RT>& other)
 template<typename RT>
 mpmt::rvector<RT>& mpmt::rvector<RT>::operator*=(const RT scalar)
 {
-    for (size_t i = 0;i < m_size_;++i)
+    for (size_t i = 0;i < m_size;++i)
     {
-        m_data_[i] *= scalar;
+        m_data[i] *= scalar;
     }
 
     return *this;
@@ -151,14 +151,14 @@ mpmt::rvector<RT>& mpmt::rvector<RT>::operator*=(const RT scalar)
 template<typename RT>
 bool mpmt::rvector<RT>::operator==(const rvector<RT>& other) const
 {
-    if (this->m_size_ != other.m_size_)
+    if (this->m_size != other.m_size)
     {
         return false;
     }
 
-    for (size_t i = 0;i < m_size_;++i)
+    for (size_t i = 0;i < m_size;++i)
     {
-        if (m_data_[i] != other.m_data_[i])
+        if (m_data[i] != other.m_data[i])
         {
             return false;
         }
@@ -176,9 +176,9 @@ template<typename RT>
 RT mpmt::rvector<RT>::reduce() const noexcept
 {
     RT reduction = 0;
-    for (size_t i = 0; i < m_size_; ++i)
+    for (size_t i = 0; i < m_size; ++i)
     {
-        reduction += m_data_[i];
+        reduction += m_data[i];
     }
     return reduction;
 }
@@ -186,7 +186,13 @@ RT mpmt::rvector<RT>::reduce() const noexcept
 template<typename RT>
 size_t mpmt::rvector<RT>::size() const noexcept
 {
-    return m_size_;
+    return m_size;
+}
+
+template<typename RT>
+const RT* mpmt::rvector<RT>::data() const noexcept
+{
+    return m_data.get();
 }
 
 template<typename RT>

@@ -128,18 +128,22 @@ namespace mpmt
         size_t size() const noexcept;
 
         /**
+         * @brief   暴露数据只读接口
+         * @return  const RT*，m_data的只读指针
+         * @note    安全性由外部包保障，此接口仅用于性能敏感场景
+         */
+        const RT* data() const noexcept;
+
+        /**
          * @brief   析构接口
          * @param   void
          * @return  void
          */
         ~rvector();
 
-        friend void rvector_load();
-        friend void rvector_load();
-
     private:
-        std::unique_ptr<RT[]> m_data_;
-        size_t m_size_;
+        std::unique_ptr<RT[]> m_data;
+        size_t m_size;
 
         /** @brief 禁用大于运算符 */
         bool operator>(const rvector<RT>& other) const = delete;

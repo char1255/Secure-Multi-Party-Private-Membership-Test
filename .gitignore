@@ -8,4 +8,7 @@ build/
 _some_backup
 
 # 局部测试资源
-./__test
+__test
+
+#
+conventions.md

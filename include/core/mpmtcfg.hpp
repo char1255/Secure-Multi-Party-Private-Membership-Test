@@ -5,29 +5,46 @@
 #define MPMT_VCB_CUDA    // Vector Computing Backend: CUDA Thrust
 #define MPMT_VCB_XSIMD   // Vector Computing Backend: XSIMD
 
-#if defined(_WIN32) || defined(_WIN64)          	// Windows
+
+#if defined(_WIN64)
     #define MPMT_OS_WIN
 
-#elif defined(__APPLE__) && defined(__MACH__)   	// macOS / iOS
+#elif defined(_WIN32)
+    #error "Windows Target is 32-bit (MPMT_OS_WIN32), which is not supported. Please compile for x64."
+
+#elif defined(__APPLE__) && defined(__MACH__)
     #include <TargetConditionals.h>
-    #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-        #define MPMT_OS_IOS
+    
+    #if defined(__x86_64__) || defined(__aarch64__)
+        
+        #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+            #define MPMT_OS_IOS
+        #else
+            #define MPMT_OS_MACOS
+        #endif
+        
     #else
-        #define MPMT_OS_MACOS
+        #error "Detected 32-bit Apple Platform (Unsupported)."
     #endif
 
-#elif defined(__ANDROID__)                       	// Android		to be continued...
-    #define MPMT_OS_ANDROID
+#elif defined(__ANDROID__)
+    #if defined(__x86_64__) || defined(__aarch64__)
+        #define MPMT_OS_ANDROID
+    #else
+        #error "Android Target is 32-bit, which is not supported for 64-bit requirement."
+    #endif
 
-#elif defined(__OHOS__)                         	// HarmonyOS	to be continued...
-    #define MPMT_OS_HARMONY
-
-#elif defined(__linux__)                    		// Linux		
-    #define MPMT_OS_LINUX
+#elif defined(__linux__)
+    #if defined(__x86_64__) || defined(__aarch64__)
+        #define MPMT_OS_LINUX
+    #else
+        #error "Linux Target is 32-bit, which is not supported for 64-bit requirement."
+    #endif
 
 #else
     #error "Unsupported Operating System."
 #endif
+
 
 // 多重检查
 #if (							\

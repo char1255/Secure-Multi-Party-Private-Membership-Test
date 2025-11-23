@@ -12,13 +12,12 @@ namespace mpmt
     public:
         enum class exc_type
         {
-            FILE_OPEN_ERROR,                // 打开文件失败
-            FILE_SEEK_ERROR,                // 读取文件指针偏移量时出错
-            FILE_INVALID_BOF,               // 文件头错误
-            FILE_INVALID_EOF,               // 文件尾错误
-            FILE_RING_SIZE_MISMATCH         /** 文件RingSize与程序预设参数不匹配，
-                                            例如文件值为16位环，但使用mrvf_handler<ring64>进行载入
-                                            */
+            OPEN_ERROR,                // 打开文件失败
+            INVALID_BOF,               // 文件头错误
+            INVALID_EOF,               // 文件尾错误
+            RING_SIZE_MISMATCH,        // 文件RingSize与程序预设参数不匹配，
+            UNDEFINED_CRC64_STANDARD,  // 未定义的CRC64计算标准
+
         };
 
         explicit mrvf_exc
@@ -36,20 +35,20 @@ namespace mpmt
         {
             switch (type)
             {
-            case exc_type::FILE_OPEN_ERROR:
+            case exc_type::OPEN_ERROR:
                 return "MRVF File open error: " + info;
 
-            case exc_type::FILE_SEEK_ERROR:
-                return "MRVF File seek error: " + info;
+            case exc_type::INVALID_BOF:
+                return "MRVF Invalid begin(header) of file: " + info;
 
-            case exc_type::FILE_INVALID_BOF:
-                return "MRVF Unexpected begin(header) of file: " + info;
+            case exc_type::INVALID_EOF:
+                return "MRVF Invalid end(footer) of file: " + info;
 
-            case exc_type::FILE_INVALID_EOF:
-                return "MRVF Unexpected end(footer) of file: " + info;
-
-            case exc_type::FILE_RING_SIZE_MISMATCH:
+            case exc_type::RING_SIZE_MISMATCH:
                 return "MRVF Ring Size Mismatch Error: " + info;
+
+            case exc_type::UNDEFINED_CRC64_STANDARD:
+                return "MRVF Undefined crc64 standard: " + info;
 
             default:
                 MPMT_WARN(false, "Undefined mrvf_exc::exc_type.");
