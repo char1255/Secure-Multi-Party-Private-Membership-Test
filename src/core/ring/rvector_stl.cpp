@@ -190,12 +190,6 @@ size_t mpmt::rvector<RT>::size() const noexcept
 }
 
 template<typename RT>
-const RT* mpmt::rvector<RT>::data() const noexcept
-{
-    return m_data.get();
-}
-
-template<typename RT>
 mpmt::rvector<RT>::~rvector() { /** 智能指针自动析构 */ }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -5,30 +5,14 @@
 #include <memory>
 #include <unordered_map>
 
+#include "core/ring/mrvf/mrvf.hpp"
 #include "core/ring/ring.hpp"
 #include "core/ring/rvector.hpp"
 #include "core/exception/mrvf_exc.hpp"
-#include "core/crc/crc64.hpp"
-#include "core/crc/crc64_factory.hpp"
 
 /** @namespace 项目命名空间 */
 namespace mpmt
 {
-    // mrvf结构体，一般不修改版本号选项
-    // 在进行环大小转换后，需要修改
-    template<typename RT>
-    struct mrvf
-    {
-        static_assert(
-            is_ring_type,
-            "RT must be ring1, ring8, ring16, ring32 or ring64."
-            );
-
-        mpmt::rvector<RT>               m_rvector;           // 向量
-        const crc64_factory::standard   mc_crc64_standard;   // crc64计算标准
-        const uint8_t                   mc_ring_size;        // 环大小
-    };
-
     template<typename RT>
     class mrvf_handler
     {
@@ -72,12 +56,11 @@ namespace mpmt
         const mrvf_handler::config mc_config;                           // 加载、保存配置设置
 
         /** @brief mrcf file format bit size (Unit: Bytes) */
-        static constexpr size_t mc_BOF_BYTE_SIZE             = 8;       // 文件头长度
-        static constexpr size_t mc_CRC64_STANDARD_BYTE_SIZE  = 1;       // CRC64计算标准字段长度
-        static constexpr size_t mc_RING_SIZE_BYTE_SIZE       = 1;       // 环大小字段长度
-        static constexpr size_t mc_RVECTOR_SIZE_BYTE_SIZE    = 4;       // 向量大小字段长度
-        static constexpr size_t mc_CRC64_BYTE_SIZE           = 8;       // CRC64字段长度
-        static constexpr size_t mc_EOF_BYTE_SIZE             = 8;       // 文件尾长度
+        static constexpr size_t mc_BOF_BYTE_SIZE             = 8ULL;    // 文件头长度
+        static constexpr size_t mc_RING_SIZE_BYTE_SIZE       = 1ULL;    // 环大小字段长度
+        static constexpr size_t mc_RVECTOR_SIZE_BYTE_SIZE    = 8ULL;    // 向量大小字段长度
+        static constexpr size_t mc_CRC64_BYTE_SIZE           = 8ULL;    // CRC64字段长度
+        static constexpr size_t mc_EOF_BYTE_SIZE             = 8ULL;    // 文件尾长度
 
         /** @brief constant value */
         static constexpr uint8_t mc_BOF[mc_BOF_BYTE_SIZE] =             // 文件头-标识"MRVF_BOF"
@@ -90,24 +73,6 @@ namespace mpmt
         };
 
         static const inline std::string mc_FILE_EXTENSION = ".mrvf";    // 文件拓展名
-
-        static const inline std::unordered_map <                        // enum到字段值的健壮转换
-            crc64_factory::standard,
-            uint8_t
-        > mc_CRC64_STANDARD_TO_UINT8_T =
-        {
-            { crc64_factory::standard::ECMA182 , 0x00 },
-            { crc64_factory::standard::ISO     , 0x01 }
-        };
-
-        static const inline std::unordered_map <                        // 字段值到enum的健壮转换
-            uint8_t,
-            crc64_factory::standard
-        > mc_UINT8_T_TO_CRC64_STANDARD =
-        {
-            { 0x00, crc64_factory::standard::ECMA182  },
-            { 0x01, crc64_factory::standard::ISO      }
-        };
 
         /** @brief 禁用拷贝与移动操作 */
         mrvf_handler() = delete;                                        // 禁止默认构造

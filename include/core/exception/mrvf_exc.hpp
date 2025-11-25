@@ -16,8 +16,6 @@ namespace mpmt
             INVALID_BOF,               // 文件头错误
             INVALID_EOF,               // 文件尾错误
             RING_SIZE_MISMATCH,        // 文件RingSize与程序预设参数不匹配，
-            UNDEFINED_CRC64_STANDARD,  // 未定义的CRC64计算标准
-
         };
 
         explicit mrvf_exc
@@ -46,9 +44,6 @@ namespace mpmt
 
             case exc_type::RING_SIZE_MISMATCH:
                 return "MRVF Ring Size Mismatch Error: " + info;
-
-            case exc_type::UNDEFINED_CRC64_STANDARD:
-                return "MRVF Undefined crc64 standard: " + info;
 
             default:
                 MPMT_WARN(false, "Undefined mrvf_exc::exc_type.");

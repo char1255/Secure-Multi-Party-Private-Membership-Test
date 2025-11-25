@@ -2,9 +2,18 @@
 #define MPMTCFG_HPP
 
 #define MPMT_VCB_STL     // Vector Computing Backend: C++STL
-#define MPMT_VCB_CUDA    // Vector Computing Backend: CUDA Thrust
-#define MPMT_VCB_XSIMD   // Vector Computing Backend: XSIMD
+// #define MPMT_VCB_CUDA    // Vector Computing Backend: CUDA Thrust
+// #define MPMT_VCB_XSIMD   // Vector Computing Backend: XSIMD
 
+#define MPMT_VCBMARCO_COUNT (defined(MPMT_VCB_CUDA) + defined(MPMT_VCB_STL) + defined(MPMT_VCB_XSIMD))
+
+#if (MPMT_VCBMARCO_COUNT) == 0
+    #error "ERROR: No vector computing backend selected. Please define exactly one of MPMT_VCB_CUDA, MPMT_VCB_STL, or MPMT_VCB_XSIMD."
+#elif (MPMT_VCBMARCO_COUNT) > 1
+    #error "ERROR: Multiple vector computing backends defined. Only one backend can be enabled at a time."
+#endif
+
+static_assert(sizeof(size_t) == 8, "ERROR: 64-bit compilation required. Program requires 64-bit pointers (sizeof(size_t) != 8).");
 
 #if defined(_WIN64)
     #define MPMT_OS_WIN
@@ -46,7 +55,7 @@
 #endif
 
 
-// 多重检查
+// 防御检查
 #if (							\
 	defined(MPMT_OS_WIN) 		\
 	+ defined(MPMT_OS_MACOS) 	\

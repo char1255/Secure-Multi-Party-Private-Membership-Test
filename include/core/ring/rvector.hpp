@@ -10,6 +10,10 @@
 /** @namespace 项目命名空间 */
 namespace mpmt
 {
+    // 前向声明友元类
+    template<typename RT>
+    class mrvf_handler;
+
     /**
      * @class   环上数组统一接口
      * @tparam  RT 环类型，限定为ring1,ring32，ring64
@@ -17,6 +21,9 @@ namespace mpmt
     template <typename RT>
     class rvector
     {
+    public:
+        friend class mrvf_handler<RT>;
+        
     public:
         /** @brief 断言限制模板类型 */
         static_assert(
@@ -126,13 +133,6 @@ namespace mpmt
          * @return  size_t 向量大小
          */
         size_t size() const noexcept;
-
-        /**
-         * @brief   暴露数据只读接口
-         * @return  const RT*，m_data的只读指针
-         * @note    安全性由外部包保障，此接口仅用于性能敏感场景
-         */
-        const RT* data() const noexcept;
 
         /**
          * @brief   析构接口
