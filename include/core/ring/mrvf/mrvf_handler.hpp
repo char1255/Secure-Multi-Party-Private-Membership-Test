@@ -32,6 +32,13 @@ namespace mpmt
         mrvf_handler(const mrvf_handler::config& config);
 
         /**
+         * @brief 从文件中载入文件规定的环大小（用于单独判断环大小场景）
+         * @param const std::string& load_path  加载路径
+         * @return uint8_t 文件的环大小
+         */
+        uint8_t read_ring_size(const std::string& load_path);
+
+        /**
          * @brief 从文件中载入mrvf对象
          * @param const std::string& load_path  加载路径
          * @return mrvf<RT>
