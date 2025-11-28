@@ -98,9 +98,9 @@ static_assert(sizeof(size_t) == 8, "ERROR: 64-bit compilation required. Program 
             }                                                           \
         } while(0)
         
-/** @namespace 项目命名空间。*/
-namespace mpmt{
+// /** @namespace 项目命名空间。*/
+// namespace mpmt{
     
-}
+// }
 
 #endif // !MPMTCFG_HPP
