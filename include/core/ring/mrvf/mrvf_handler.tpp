@@ -24,7 +24,7 @@ namespace mpmt
         {
             throw mpmt::mrvf_exc
             (
-                mrvf_exc::exc_type::OPEN_ERROR,
+                mrvf_exc::exc_type::IOFLOW_ERROR,
                 "Can not open the file [" + load_path + "]."
             );
         }
@@ -36,15 +36,16 @@ namespace mpmt
         in_file.seekg(offset);
 
         //  2.2-检查是否seek成功
-        if (!in_file)
+        if (!in_file.good())
         {
             throw mpmt::mrvf_exc
             (
-                mrvf_exc::exc_type::INVALID_EOF,
-                "The file ["
+                mrvf_exc::exc_type::IOFLOW_ERROR,
+                "Cannot seek to the offset="
+                + std::to_string(offset)
+                + " of file ["
                 + load_path
-                + "] was unexpectedly truncated, making it impossible to access offset="
-                + std::to_string(offset) + "."
+                + "]."
             );
         }
 
@@ -52,19 +53,22 @@ namespace mpmt
         // 3-读取ring_size字段
         //  3.1-读取
         uint8_t ring_size;
-        in_file.read((char*)&ring_size, sizeof(uint8_t));
+        size_t ring_size_byte_size = sizeof(uint8_t);
+        in_file.read((char*)&ring_size, ring_size_byte_size);
 
         //  3.2-检查是否读入成功
         if (!in_file)
         {
             throw mpmt::mrvf_exc
             (
-                mrvf_exc::exc_type::IFAILED,
-                "Can not read file["
+                mrvf_exc::exc_type::IOFLOW_ERROR,
+                "Can not read data of length="
+                + std::to_string(ring_size_byte_size)
+                + " from file["
                 + load_path
                 + "] at offset="
                 + std::to_string(offset)
-                + "correctly."
+                + " correctly."
             );
         }
 
@@ -97,29 +101,89 @@ namespace mpmt
             {
                 throw mpmt::mrvf_exc
                 (
-                    mrvf_exc::exc_type::OPEN_ERROR,
-                    "Can not open the file [" + load_path + "]."
+                    mrvf_exc::exc_type::IOFLOW_ERROR,
+                    "Can not open the file ["
+                    + load_path
+                    + "]."
                 );
             }
 
 
-            // 2-完整读入文件
+            // 2-完整读入文件到缓存区
             //  2.1-获取完整的文件大小并重置指针
             in_file.seekg(0, std::ios::end);
-            const size_t c_file_byte_size = static_cast<std::size_t>(in_file.tellg());
+            if (!in_file.good())
+            {
+                throw mpmt::mrvf_exc(
+                    mrvf_exc::exc_type::IOFLOW_ERROR,
+                    "Cannot seek to the end of the file ["
+                    + load_path
+                    + "]."
+                );
+            }
+            auto pos = in_file.tellg();
+            if (pos == std::ifstream::pos_type(-1))
+            {
+                throw mpmt::mrvf_exc
+                (
+                    mrvf_exc::exc_type::IOFLOW_ERROR,
+                    "Cannot get the size of the file ["
+                    + load_path
+                    + "] correctly."
+                );
+            }
+            const size_t c_file_byte_size = static_cast<size_t>(pos);
             in_file.seekg(0, std::ios::beg);
+            if (!in_file.good())
+            {
+                throw mpmt::mrvf_exc(
+                    mrvf_exc::exc_type::IOFLOW_ERROR,
+                    "Cannot seek to the start of the file ["
+                    + load_path
+                    + "]."
+                );
+            }
 
-            //  2.2-分配缓存区
+            //  2.2-判断文件大小是否超出限制
+            if (c_file_byte_size > mc_MIN_FILE_SIZE + mc_MAX_RVECTOR_SIZE * sizeof(RT))
+            {
+                throw mpmt::mrvf_exc
+                (
+                    mrvf_exc::exc_type::FILE_CORRUPTION,
+                    "The size of the file["
+                    + load_path
+                    + "] exceeds the allowed limit. Loaded file size: "
+                    + std::to_string(c_file_byte_size)
+                    + " byte(s); maximum allowed: "
+                    + std::to_string(mc_MIN_FILE_SIZE + mc_MAX_RVECTOR_SIZE * sizeof(RT))
+                    + " byte(s)."
+                );
+            }
+
+            //  2.3-判断文件是否不满足最小大小
+            if (c_file_byte_size < mc_MIN_FILE_SIZE)
+            {
+                throw mpmt::mrvf_exc(
+                    mrvf_exc::exc_type::FILE_CORRUPTION,
+                    "File["
+                    + load_path
+                    + "] is unexpectedly truncated. Its size is below the minimum expected threshold="
+                    + std::to_string(mc_MIN_FILE_SIZE)
+                    + "byte(s)."
+                );
+            }
+
+            //  2.4-分配缓存区
             std::unique_ptr<uint8_t[]> file_buffer = std::make_unique<uint8_t[]>(c_file_byte_size);
 
-            //  2.3-读入数据到缓存区并校验操作
+            //  2.5-读入数据到缓存区并校验操作
             in_file.read(reinterpret_cast<char*>(file_buffer.data()), c_file_byte_size);
             if (!in_file)
             {
                 throw mpmt::mrvf_exc
                 (
-                    mrvf_exc::exc_type::IFAILED,
-                    "Can not read all file["
+                    mrvf_exc::exc_type::IOFLOW_ERROR,
+                    "Can not read data from the file["
                     + load_path
                     + "] correctly."
                 );
@@ -137,8 +201,12 @@ namespace mpmt
                 {
                     throw mpmt::mrvf_exc
                     (
-                        mrvf_exc::exc_type::INVALID_BOF,
-                        "BOF mismatch found in file_buffer at index " + std::to_string(i) + "."
+                        mrvf_exc::exc_type::FILE_CORRUPTION,
+                        "Invalid beginning of the file ["
+                        + load_path
+                        + "] or it is corrupted. BOF mismatch detected in file buffer at index="
+                        + std::to_string(i)
+                        + "."
                     );
                 }
             }
@@ -151,9 +219,9 @@ namespace mpmt
                 throw mpmt::mrvf_exc
                 (
                     mrvf_exc::exc_type::RING_SIZE_MISMATCH,
-                    "The file["
+                    "Ring size mismatches in the file["
                     + load_path
-                    + "]declares ring as Z_{2^"
+                    + "] or it is corrupted. The file declares ring as Z_{2^"
                     + std::to_string(ring_size * 8)
                     + "}, but the selected parameter is Z_{2^"
                     + std::to_string(sizeof(RT) * 8)
@@ -163,6 +231,7 @@ namespace mpmt
             ipointer += mc_RING_SIZE_BYTE_SIZE;
 
             //  3.4-读入向量大小字段 
+            //  (1) 读入字段
             size_t rvector_size;
             std::memcpy
             (
@@ -171,7 +240,24 @@ namespace mpmt
                 mc_RVECTOR_SIZE_BYTE_SIZE
             );
             ipointer += mc_RVECTOR_SIZE_BYTE_SIZE;
-            size_t rvector_byte_size = rvector_size * sizeof(RT);
+            const size_t c_rvector_byte_size = rvector_size * sizeof(RT);
+            //  (2) 检查文件是否意外损害
+            if (c_rvector_byte_size + mc_MIN_FILE_SIZE != c_file_byte_size)
+            {
+                throw mpmt::mrvf_exc(
+                    mrvf_exc::exc_type::FILE_CORRUPTION,
+                    "The value read from 'rvector_size' does not match the expected value in the file ["
+                    + load_path
+                    + "]. The value of rvector_size="
+                    + std::to_string(c_rvector_byte_size)
+                    + " plus the fixed header length="
+                    + std::to_string(mc_MIN_FILE_SIZE)
+                    + " does not match the total file size="
+                    + std::to_string(c_file_byte_size)
+                    + "."
+                );
+            }
+
 
             //  3.5 写入向量
             //  (1) 初始化 rvector
@@ -181,9 +267,9 @@ namespace mpmt
             (
                 reinterpret_cast<char*>(l_rvector.m_data),
                 reinterpret_cast<char*>(file_buffer.get()) + ipointer,
-                rvector_byte_size
+                c_rvector_byte_size
             );
-            ipointer += (rvector_byte_size);
+            ipointer += (c_rvector_byte_size);
 
             // 3.6 进行crc64校验
             if (mc_config.m_validate_checksum)
@@ -200,7 +286,7 @@ namespace mpmt
                 const size_t c_crc64_compute_len
                     = mc_RING_SIZE_BYTE_SIZE
                     + mc_RVECTOR_SIZE_BYTE_SIZE
-                    + rvector_byte_size;
+                    + c_rvector_byte_size;
                 // (3) 比较CRC校验和
                 uint64_t computing_crc64 = mpmt::crc64::compute
                 (
@@ -211,10 +297,13 @@ namespace mpmt
                 {
                     throw mpmt::mrvf_exc
                     (
-                        mrvf_exc::exc_type::CRC64_CHECK_FAILED,
-                        "Checksum mismatch--Expected "
+
+                        mrvf_exc::exc_type::FILE_CORRUPTION,
+                        "CRC64 check failed in the file["
+                        + load_path
+                        + "]. Expected checksum="
                         + std::to_string(file_crc64)
-                        + " (from file) but computed "
+                        + " from file, but computed checksum="
                         + std::to_string(computing_crc64)
                         + "."
                     );
@@ -229,8 +318,12 @@ namespace mpmt
                 {
                     throw mpmt::mrvf_exc
                     (
-                        mrvf_exc::exc_type::INVALID_EOF,
-                        "EOF mismatch found in file_buffer at index " + std::to_string(i) + "."
+                        mrvf_exc::exc_type::FILE_CORRUPTION,
+                        "Invalid end of the file["
+                        + load_path
+                        + "]. EOF mismatch found in file_buffer at index "
+                        + std::to_string(i)
+                        + "."
                     );
                 }
 
@@ -258,10 +351,14 @@ namespace mpmt
         // 且ring_size是const，只是写一个防御性判断...
         if (mrvf_obj.mc_ring_size != sizeof(RT))
         {
-            throw mpmt::mrvf_exc(
-                mrvf_exc::exc_type::RING_SIZE_MISMATCH,
-                "Ring size mismath while saving mrvf to file [" + save_path + "]."
-            );
+            mrvf_exc::exc_type::RING_SIZE_MISMATCH,
+                "Ring size mismatch while saving mrvf to file ["
+                + save_path
+                + "]. mrvf_obj.mc_ring_size = "
+                + std::to_string(mrvf_obj.mc_ring_size)
+                + ", sizeof(RT) = "
+                + std::to_string(sizeof(RT))
+                + "."
         }
 
         if (mc_config.m_use_memory_map)
@@ -285,7 +382,7 @@ namespace mpmt
             {
                 throw mpmt::mrvf_exc
                 (
-                    mrvf_exc::exc_type::OPEN_ERROR,
+                    mrvf_exc::exc_type::IOFLOW_ERROR,
                     "Can not open the new created file [" + save_path + "]."
                 );
             }

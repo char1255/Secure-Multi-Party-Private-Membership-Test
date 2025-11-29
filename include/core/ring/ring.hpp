@@ -65,7 +65,7 @@ namespace mpmt
     inline RT boolean_to_arithmetic(const ring1 x)
     {
         static_assert(
-            is_ring_type && !std::is_same_v<RT, ring1>,
+            is_ring_type<RT> && !std::is_same_v<RT, ring1>,
             "RT must be ring8, ring16, ring32, or ring64."
             );
 
@@ -76,7 +76,7 @@ namespace mpmt
     inline ring1 arithmetic_to_boolean(const RT x)
     {
         static_assert(
-            is_ring_type && !std::is_same_v<RT, ring1>,
+            is_ring_type<RT> && !std::is_same_v<RT, ring1>,
             "RT must be ring8, ring16, ring32, or ring64."
             );
 
@@ -87,7 +87,7 @@ namespace mpmt
     RT ring1::fill_bits()
     {
         static_assert(
-            is_ring_type && !std::is_same_v<RT, ring1>,
+            is_ring_type<RT> && !std::is_same_v<RT, ring1>,
             "RT must be ring8, ring16, ring32, or ring64."
             );
 

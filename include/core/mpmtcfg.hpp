@@ -81,7 +81,7 @@ static_assert(sizeof(size_t) == 8, "ERROR: 64-bit compilation required. Program 
 					#cond, msg, __func__, __FILE__, __LINE__);			\
 				exit(1);                                                \
 			}                                                           \
-		} while(0)
+		} while(0)·
 
 // 后续更新日志系统，让WARN的内容更新到日志内容中
 #define MPMT_WARN(cond, msg)                                           	\
