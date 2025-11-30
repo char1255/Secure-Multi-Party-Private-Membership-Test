@@ -16,7 +16,7 @@ namespace mpmt
         /** @brief 模板支持参数 */
         template<typename DT>
         inline constexpr bool rng_adapter_supported =
-            is_ring_type,
+            is_ring_type<DT>,
             std::is_same_v<DT, size_t>;
 
         /** @brief 根据模板类型选择容器 */

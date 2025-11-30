@@ -21,7 +21,6 @@ namespace mpmt
         {
             bool m_use_memory_map;          // 读写文件时是否启用内存映射
             bool m_enable_parallel_read;    // 是否启用多线程读入
-            bool m_validate_checksum;       // 读取文件时是否验证校验码
         };
 
         /** @brief 断言限制模板类型 */
@@ -64,18 +63,18 @@ namespace mpmt
         const mrvf_handler::config mc_config;                               // 加载、保存配置设置
 
         /** @brief mrcf file format bit size (Unit: Bytes) */
-        static constexpr size_t mc_BOF_BYTE_SIZE = 8ULL;        // 文件头长度
-        static constexpr size_t mc_RING_SIZE_BYTE_SIZE = 1ULL;        // 环大小字段长度
-        static constexpr size_t mc_RVECTOR_SIZE_BYTE_SIZE = 8ULL;        // 向量大小字段长度
-        static constexpr size_t mc_CRC64_BYTE_SIZE = 8ULL;        // CRC64字段长度
-        static constexpr size_t mc_EOF_BYTE_SIZE = 8ULL;        // 文件尾长度
+        static constexpr size_t mc_BOF_BYTE_SIZE            = 8ULL;         // 文件头长度
+        static constexpr size_t mc_RING_SIZE_BYTE_SIZE      = 1ULL;         // 环大小字段长度
+        static constexpr size_t mc_RVECTOR_SIZE_BYTE_SIZE   = 8ULL;         // 向量大小字段长度
+        static constexpr size_t mc_CRC64_BYTE_SIZE          = 8ULL;         // CRC64字段长度
+        static constexpr size_t mc_EOF_BYTE_SIZE            = 8ULL;         // 文件尾长度
         static constexpr size_t mc_MIN_FILE_SIZE =                          // 文件最小长度
             mc_BOF_BYTE_SIZE +
             mc_RING_SIZE_BYTE_SIZE +
             mc_RVECTOR_SIZE_BYTE_SIZE +
             mc_CRC64_BYTE_SIZE +
             mc_EOF_BYTE_SIZE;
-        static constexpr size_t mc_MAX_RVECTOR_SIZE = 1ULL << 50;  // 系统允许的最大长度为 50
+        static constexpr size_t mc_MAX_RVECTOR_SIZE         = 1ULL << 50;   // 系统允许的最大长度为 50
 
         /** @brief constant value */
         static constexpr uint8_t mc_BOF[mc_BOF_BYTE_SIZE] =                 // 文件头-标识"MRVF_BOF"

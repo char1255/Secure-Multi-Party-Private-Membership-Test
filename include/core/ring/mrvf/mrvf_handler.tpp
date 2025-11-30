@@ -272,42 +272,39 @@ namespace mpmt
             ipointer += (c_rvector_byte_size);
 
             // 3.6 进行crc64校验
-            if (mc_config.m_validate_checksum)
+            // (1) 从文件中读出校验和
+            uint64_t file_crc64;
+            std::memcpy
+            (
+                reinterpret_cast<char*>(&file_crc64),
+                reinterpret_cast<char*>(file_buffer.get()) + ipointer,
+                mc_CRC64_BYTE_SIZE
+            );
+            // (2) 计算CRC校验长度
+            const size_t c_crc64_compute_len
+                = mc_RING_SIZE_BYTE_SIZE
+                + mc_RVECTOR_SIZE_BYTE_SIZE
+                + c_rvector_byte_size;
+            // (3) 比较CRC校验和
+            uint64_t computing_crc64 = mpmt::crc64::compute
+            (
+                file_buffer.get() + mc_BOF_BYTE_SIZE,
+                c_crc64_compute_len
+            );
+            if (file_crc64 != computing_crc64)
             {
-                // (1) 读出校验和
-                uint64_t file_crc64;
-                std::memcpy
+                throw mpmt::mrvf_exc
                 (
-                    reinterpret_cast<char*>(&file_crc64),
-                    reinterpret_cast<char*>(file_buffer.get()) + ipointer,
-                    mc_CRC64_BYTE_SIZE
-                );
-                // (2) 计算CRC校验长度
-                const size_t c_crc64_compute_len
-                    = mc_RING_SIZE_BYTE_SIZE
-                    + mc_RVECTOR_SIZE_BYTE_SIZE
-                    + c_rvector_byte_size;
-                // (3) 比较CRC校验和
-                uint64_t computing_crc64 = mpmt::crc64::compute
-                (
-                    file_buffer.get() + mc_BOF_BYTE_SIZE,
-                    c_crc64_compute_len
-                );
-                if (file_crc64 != computing_crc64)
-                {
-                    throw mpmt::mrvf_exc
-                    (
 
-                        mrvf_exc::exc_type::FILE_CORRUPTION,
-                        "CRC64 check failed in the file["
-                        + load_path
-                        + "]. Expected checksum="
-                        + std::to_string(file_crc64)
-                        + " from file, but computed checksum="
-                        + std::to_string(computing_crc64)
-                        + "."
-                    );
-                }
+                    mrvf_exc::exc_type::FILE_CORRUPTION,
+                    "CRC64 check failed in the file["
+                    + load_path
+                    + "]. Expected checksum="
+                    + std::to_string(file_crc64)
+                    + " from file, but computed checksum="
+                    + std::to_string(computing_crc64)
+                    + "."
+                );
             }
             ipointer += mc_CRC64_BYTE_SIZE;
 
@@ -331,7 +328,7 @@ namespace mpmt
             ipointer += mc_EOF_BYTE_SIZE;
 
             // 3.8-防御性断言，确保没有未定义错误
-            MPMT_ASSERT(ipointer == c_file_byte_size, "File write operation was unexpectedly interrupted.");
+            MPMT_ASSERT(ipointer == c_file_byte_size, "File read operation was unexpectedly interrupted.");
 
 
             // 4-返回读入的mrvf对象
@@ -351,7 +348,9 @@ namespace mpmt
         // 且ring_size是const，只是写一个防御性判断...
         if (mrvf_obj.mc_ring_size != sizeof(RT))
         {
-            mrvf_exc::exc_type::RING_SIZE_MISMATCH,
+            throw mrvf_exc
+            (
+                mrvf_exc::exc_type::RING_SIZE_MISMATCH,
                 "Ring size mismatch while saving mrvf to file ["
                 + save_path
                 + "]. mrvf_obj.mc_ring_size = "
@@ -359,6 +358,7 @@ namespace mpmt
                 + ", sizeof(RT) = "
                 + std::to_string(sizeof(RT))
                 + "."
+            );
         }
 
         if (mc_config.m_use_memory_map)
@@ -396,12 +396,8 @@ namespace mpmt
             const size_t c_rvector_byte_size = c_rvector_size * sizeof(RT);
             //  (3) 文件大小（字节）
             const size_t c_file_byte_size           // 单位：字节
-                = mc_BOF_BYTE_SIZE                  // 文件头
-                + mc_RING_SIZE_BYTE_SIZE            // 环大小字段
-                + mc_RVECTOR_SIZE_BYTE_SIZE         // 向量大小字段
-                + c_rvector_byte_size               // 数据段
-                + mc_CRC64_BYTE_SIZE                // CRC64校验码字段
-                + mc_EOF_BYTE_SIZE;                 // 文件尾
+                = mc_MIN_FILE_SIZE                  // 文件头+环大小字段+向量大小字段+crc校验码字段+文件尾
+                + c_rvector_byte_size;              // 数据段大小
 
             //  2.2-为缓存区分配内存
             std::unique_ptr<uint8_t[]> file_buffer = std::make_unique<uint8_t[]>(c_file_byte_size);

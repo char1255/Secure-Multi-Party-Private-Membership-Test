@@ -27,7 +27,7 @@ namespace mpmt
     public:
         /** @brief 断言限制模板类型 */
         static_assert(
-            is_ring_type,
+            is_ring_type<RT>,
             "RT must be ring1, ring8, ring16, ring32, or ring64."
             );
 

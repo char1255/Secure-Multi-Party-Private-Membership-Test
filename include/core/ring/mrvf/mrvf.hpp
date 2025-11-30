@@ -10,7 +10,7 @@ namespace mpmt
     struct mrvf : mrvf_info<RT>
     {
         static_assert(
-            is_ring_type,
+            is_ring_type<RT>,
             "RT must be ring1, ring8, ring16, ring32 or ring64."
             );
 
