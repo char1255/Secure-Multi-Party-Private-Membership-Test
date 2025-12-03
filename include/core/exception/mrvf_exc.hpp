@@ -2,7 +2,7 @@
 #define MRVF_EXC_HPP
 
 #include <stdexcept>
-#include <mpmtcfg.hpp>
+#include "core/mpmtcfg.hpp"
 
 /** @namespace 项目命名空间 */
 namespace mpmt

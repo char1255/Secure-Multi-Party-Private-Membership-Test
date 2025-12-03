@@ -1,8 +1,8 @@
 #ifndef PROFILER_HPP
 #define PROFILER_HPP
 
-/** @namespace 项目命名空间。*/
-namespace _utils
+/** @namespace 辅助工具命名空间。*/
+namespace utils
 {
     /**
      * @class 性能分析器

@@ -1,15 +1,15 @@
 #ifndef MPMTCFG_HPP
 #define MPMTCFG_HPP
+#include "auxkit/stack_tracer.hpp"
 
 #define MPMT_VCB_STL     // Vector Computing Backend: C++STL
 // #define MPMT_VCB_CUDA    // Vector Computing Backend: CUDA Thrust
 // #define MPMT_VCB_XSIMD   // Vector Computing Backend: XSIMD
 
-#define MPMT_VCBMARCO_COUNT (defined(MPMT_VCB_CUDA) + defined(MPMT_VCB_STL) + defined(MPMT_VCB_XSIMD))
 
-#if (MPMT_VCBMARCO_COUNT) == 0
+#if (defined(MPMT_VCB_CUDA) + defined(MPMT_VCB_STL) + defined(MPMT_VCB_XSIMD)) == 0
     #error "ERROR: No vector computing backend selected. Please define exactly one of MPMT_VCB_CUDA, MPMT_VCB_STL, or MPMT_VCB_XSIMD."
-#elif (MPMT_VCBMARCO_COUNT) > 1
+#elif (defined(MPMT_VCB_CUDA) + defined(MPMT_VCB_STL) + defined(MPMT_VCB_XSIMD)) > 1
     #error "ERROR: Multiple vector computing backends defined. Only one backend can be enabled at a time."
 #endif
 
@@ -67,8 +67,9 @@ static_assert(sizeof(size_t) == 8, "ERROR: 64-bit compilation required. Program 
 #endif
 
 
-// 后续更新堆栈打印工具，并通过日志系统更新到日志内容中
-#define MPMT_ASSERT(cond, msg)                                          \
+#if defined(MPMT_DEBUG)
+// 内部断言
+    #define MPMT_ASSERT(cond, msg)                                      \
 		do {                                                            \
 			if (!(cond)) {                                             	\
 				fprintf(stderr,                                         \
@@ -79,12 +80,13 @@ static_assert(sizeof(size_t) == 8, "ERROR: 64-bit compilation required. Program 
 					"  File      : %s\n"                                \
 					"  Line      : %d\n",                               \
 					#cond, msg, __func__, __FILE__, __LINE__);			\
+                    utils::stack_tracer::print();                       \
 				exit(1);                                                \
 			}                                                           \
-		} while(0)·
+		} while(0)
 
-// 后续更新日志系统，让WARN的内容更新到日志内容中
-#define MPMT_WARN(cond, msg)                                           	\
+// 警告信息
+    #define MPMT_WARN(cond, msg)                                        \
         do {                                                            \
             if (!(cond)) {                                              \
                 fprintf(stderr,                                         \
@@ -97,6 +99,10 @@ static_assert(sizeof(size_t) == 8, "ERROR: 64-bit compilation required. Program 
                     #cond, msg, __func__, __FILE__, __LINE__);          \
             }                                                           \
         } while(0)
+#else 
+    #define MPMT_ASSERT(cond, msg) ((void)0)
+    #define MPMT_WARN(cond, msg)   ((void)0)
+#endif 
         
 /** @namespace 项目命名空间。*/
 namespace mpmt{

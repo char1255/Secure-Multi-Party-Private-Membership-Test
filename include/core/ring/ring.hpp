@@ -61,6 +61,14 @@ namespace mpmt
     /** @typedef 64位环。 */
     using ring64 = uint64_t;
 
+    template<typename RT>
+    constexpr bool is_ring_type =
+        std::is_same_v<RT, ring1> ||
+        std::is_same_v<RT, ring8> ||
+        std::is_same_v<RT, ring16> ||
+        std::is_same_v<RT, ring32> ||
+        std::is_same_v<RT, ring64>;
+
     template <typename RT>
     inline RT boolean_to_arithmetic(const ring1 x)
     {
@@ -94,14 +102,5 @@ namespace mpmt
         RT data = static_cast<RT>(0);
         return (m_v == 0) ? data : ~data;
     }
-
-    template<typename RT>
-    constexpr bool is_ring_type =
-        std::is_same_v<RT, ring1>   ||
-        std::is_same_v<RT, ring8>   ||
-        std::is_same_v<RT, ring16>  ||
-        std::is_same_v<RT, ring32>  ||
-        std::is_same_v<RT, ring64>;
-
 }
 #endif // !RING_HPP

@@ -12,3 +12,9 @@ __test
 
 #
 conventions.md
+
+# 
+.clang-format
+.clangd
+
+.cache

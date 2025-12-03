@@ -1,11 +1,7 @@
 #ifndef RANDOM_OPENSSL_HPP
 #define RANDOM_OPENSSL_HPP
 
-#include <type_traits>
-#include <vector>
 #include <openssl/rand.h>
-
-#include "core/mpmtcfg.hpp"
 #include "core/rng/rng_adapter.hpp"
 
 /** @namespace 项目命名空间。 */
@@ -48,7 +44,8 @@ namespace mpmt
          * @note    1. 需要保障 lb <= ub。
          *          2. 如何rands大小与num一致。
          */
-        void rand(
+        void rand
+        (
             const size_t num,
             rcontainer& rands
         ) const override;

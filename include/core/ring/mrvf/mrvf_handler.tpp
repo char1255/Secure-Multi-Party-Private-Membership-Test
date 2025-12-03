@@ -1,11 +1,7 @@
-#ifndef MRVF_HANDLER_TPP
-#define MRVF_HANDLER_TPP
-
 #include <cstring>
 #include <fstream>
 
 #include "core/mpmtcfg.hpp"
-#include "core/ring/mrvf/mrvf_handler.hpp"
 #include "core/crc/crc64.hpp"
 
 namespace mpmt
@@ -177,7 +173,7 @@ namespace mpmt
             std::unique_ptr<uint8_t[]> file_buffer = std::make_unique<uint8_t[]>(c_file_byte_size);
 
             //  2.5-读入数据到缓存区并校验操作
-            in_file.read(reinterpret_cast<char*>(file_buffer.data()), c_file_byte_size);
+            in_file.read(reinterpret_cast<char*>(file_buffer.get()), c_file_byte_size);
             if (!in_file)
             {
                 throw mpmt::mrvf_exc
@@ -265,7 +261,7 @@ namespace mpmt
             //  (2) 将数据拷入rvector
             std::memcpy
             (
-                reinterpret_cast<char*>(l_rvector.m_data),
+                reinterpret_cast<char*>(l_rvector.m_data.get()),
                 reinterpret_cast<char*>(file_buffer.get()) + ipointer,
                 c_rvector_byte_size
             );
@@ -422,7 +418,7 @@ namespace mpmt
             std::memcpy
             (
                 reinterpret_cast<char*>(file_buffer.get()) + opointer,
-                reinterpret_cast<char*>(&c_rvector_size),
+                reinterpret_cast<const char*>(&c_rvector_size),
                 mc_RVECTOR_SIZE_BYTE_SIZE
             );
             opointer += mc_RVECTOR_SIZE_BYTE_SIZE;
@@ -477,4 +473,3 @@ namespace mpmt
         }
     }
 }
-#endif // !MRVF_HANDLER_TPP

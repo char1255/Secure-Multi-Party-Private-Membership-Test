@@ -1,7 +1,8 @@
 #ifndef RANDOM_OPENSSL_TPP
 #define RANDOM_OPENSSL_TPP
 
-#include <vector>
+#include <string>     // 确保包含 std::string
+#include <cstring>    
 #include <limits>
 #include "core/mpmtcfg.hpp"
 #include "core/rng/openssl_impl/rng_openssl.hpp"

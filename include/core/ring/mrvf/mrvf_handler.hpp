@@ -2,9 +2,7 @@
 #define MRVF_HANDLER_HPP
 
 #include <string>
-#include <memory>
-#include <unordered_map>
-
+#include "core/mpmtcfg.hpp"
 #include "core/ring/mrvf/mrvf.hpp"
 #include "core/ring/ring.hpp"
 #include "core/ring/rvector.hpp"

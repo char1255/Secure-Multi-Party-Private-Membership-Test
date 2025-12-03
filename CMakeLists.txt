@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 
 # 定义项目基准信息
-set(CHAR_PROJ_NAME "MP-PMT")
-project(${CHAR_PROJ_NAME} VERSION 1.0 LANGUAGES CXX)
+set(PENELOPE_PROJ_NAME "MP-PMT")
+project(${PENELOPE_PROJ_NAME} VERSION 1.0 LANGUAGES CXX)
 
 # Compiler whitelist check
 string(TOLOWER "${CMAKE_CXX_COMPILER_ID}" COMPILER_ID_LOWER)
@@ -37,9 +37,8 @@ find_package(OpenSSL REQUIRED)          # OpenSSL
 find_package(xsimd CONFIG REQUIRED)     # XSIMD
 
 # 添加可执行文件
-add_executable(${CHAR_PROJ_NAME} 
+add_executable(${PENELOPE_PROJ_NAME} 
     src/main.cpp
-    src/core/crc/crc64_ecma182.cpp
     src/core/ring/rvector_stl.cpp
     src/core/ring/rvector_xsimd.cpp
     src/core/protocol/ass_impl/agent_ass.cpp
@@ -49,13 +48,32 @@ add_executable(${CHAR_PROJ_NAME}
     src/core/protocol/fss_impl/data_holder_fss.cpp
     src/core/protocol/fss_impl/querier_fss.cpp
     src/auxkit/profiler.cpp
+    src/auxkit/stack_tracer.cpp
 )
 
-# 链接依赖
-target_link_libraries(${CHAR_PROJ_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
-target_link_libraries(${CHAR_PROJ_NAME}  PRIVATE xsimd)
+# Debug模式配置
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    # 定义DEBUG条件编译宏
+    target_compile_definitions(${PENELOPE_PROJ_NAME} PRIVATE MPMT_DEBUG)
 
+    # Debug模式下生成PDB
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${PENELOPE_PROJ_NAME} PRIVATE -gcodeview)
+        target_link_options(${PENELOPE_PROJ_NAME} PRIVATE -Wl,-pdb=${PENELOPE_PROJ_NAME}.pdb)
+    else()
+        # MinGW/GCC 使用普通 DWARF 调试信息
+        target_compile_options(${PENELOPE_PROJ_NAME} PRIVATE -g)
+    endif()
+endif()
+
+# 链接依赖
+target_link_libraries(${PENELOPE_PROJ_NAME} PRIVATE
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    xsimd
+    dbghelp
+    kernel32
+)
 
 # 指定 include 路径
-target_include_directories(${CHAR_PROJ_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
-# include_directories(include)  # 弃用高耦合方案
+target_include_directories(${PENELOPE_PROJ_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)

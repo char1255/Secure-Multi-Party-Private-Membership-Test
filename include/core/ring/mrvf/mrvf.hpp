@@ -7,7 +7,7 @@
 namespace mpmt
 {
     template<typename RT>
-    struct mrvf : mrvf_info<RT>
+    struct mrvf
     {
         static_assert(
             is_ring_type<RT>,
