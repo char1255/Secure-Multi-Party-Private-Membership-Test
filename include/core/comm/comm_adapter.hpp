@@ -4,15 +4,12 @@
 #include <type_traits>
 #include <vector>
 
-#include "core/mpmtcfg.hpp"
-#include "core/ring/ring.hpp"
-
 /** @namespace 项目命名空间。 */
 namespace mpmt
 {
     /**
      * @class   通信适配器，用于封装不同实现的通信接口。
-     * @tparam  DT 随机数数据类型，限定为 ring8, ring16 ring32, ring64, size_t
+     * @tparam  DT 随机数数据类型，限定为 uint8_t, uint16_t uint32_t, uint64_t
      * @note    一个comm_adapter对象在同一时刻维护单独的一条连接，
      *          一些连接信息应通过实现类的构造函数赋值，并存储于实现类的成员变量中。
      */
@@ -22,12 +19,11 @@ namespace mpmt
     public:
         /** @brief 断言限制模板类型 */
         static_assert(
-            std::is_same_v<DT, ring8>
-            || std::is_same_v<DT, ring16> 
-            || std::is_same_v<DT, ring32> 
-            || std::is_same_v<DT, ring64>
-            || std::is_same_v<DT, size_t>,
-            "DT must be ring8, ring16, ring32, ring64 or size_t."
+            std::is_same_v<DT, uint8_t>
+            || std::is_same_v<DT, uint16_t> 
+            || std::is_same_v<DT, uint32_t> 
+            || std::is_same_v<DT, uint64_t>,
+            "DT must be uint8_t, uint16_t, uint32_t or uint64_t."
         );
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

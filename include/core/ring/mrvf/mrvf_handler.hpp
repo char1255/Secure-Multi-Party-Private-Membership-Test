@@ -2,11 +2,8 @@
 #define MRVF_HANDLER_HPP
 
 #include <string>
-#include "core/mpmtcfg.hpp"
 #include "core/ring/mrvf/mrvf.hpp"
 #include "core/ring/ring.hpp"
-#include "core/ring/rvector.hpp"
-#include "core/exception/mrvf_exc.hpp"
 
 /** @namespace 项目命名空间 */
 namespace mpmt
@@ -61,27 +58,29 @@ namespace mpmt
         const mrvf_handler::config mc_config;                               // 加载、保存配置设置
 
         /** @brief mrcf file format bit size (Unit: Bytes) */
-        static constexpr size_t mc_BOF_BYTE_SIZE            = 8ULL;         // 文件头长度
-        static constexpr size_t mc_RING_SIZE_BYTE_SIZE      = 1ULL;         // 环大小字段长度
-        static constexpr size_t mc_RVECTOR_SIZE_BYTE_SIZE   = 8ULL;         // 向量大小字段长度
-        static constexpr size_t mc_CRC64_BYTE_SIZE          = 8ULL;         // CRC64字段长度
-        static constexpr size_t mc_EOF_BYTE_SIZE            = 8ULL;         // 文件尾长度
-        static constexpr size_t mc_MIN_FILE_SIZE =                          // 文件最小长度
+        static constexpr uint64_t mc_BOF_BYTE_SIZE            = 8ULL;       // 文件头长度
+        static constexpr uint64_t mc_RING_SIZE_BYTE_SIZE      = 1ULL;       // 环大小字段长度
+        static constexpr uint64_t mc_RVECTOR_SIZE_BYTE_SIZE   = 8ULL;       // 向量大小字段长度
+        static constexpr uint64_t mc_CRC64_BYTE_SIZE          = 8ULL;       // CRC64字段长度
+        static constexpr uint64_t mc_EOF_BYTE_SIZE            = 8ULL;       // 文件尾长度
+        static constexpr uint64_t mc_MIN_FILE_SIZE =                        // 文件最小长度
             mc_BOF_BYTE_SIZE +
             mc_RING_SIZE_BYTE_SIZE +
             mc_RVECTOR_SIZE_BYTE_SIZE +
             mc_CRC64_BYTE_SIZE +
             mc_EOF_BYTE_SIZE;
-        static constexpr size_t mc_MAX_RVECTOR_SIZE         = 1ULL << 50;   // 系统允许的最大长度为 50
+        static constexpr uint64_t mc_MAX_RVECTOR_SIZE         = 1ULL << 50; // 系统允许的最大长度为 50
 
         /** @brief constant value */
         static constexpr uint8_t mc_BOF[mc_BOF_BYTE_SIZE] =                 // 文件头-标识"MRVF_BOF"
         {
-            0x4d,0x52,0x56,0x46,0x5f,0x42,0x4f,0x46
+            0x4d,0x52,0x56,0x46,
+            0x5f,0x42,0x4f,0x46
         };
         static constexpr uint8_t mc_EOF[mc_EOF_BYTE_SIZE] =                 // 文件尾-标识"MRVF_EOF"
         {
-            0x4d,0x52,0x56,0x46,0x5f,0x45,0x4f,0x46
+            0x4d,0x52,0x56,0x46,
+            0x5f,0x45,0x4f,0x46
         };
 
         static const inline std::string mc_FILE_EXTENSION = ".mrvf";        // 文件拓展名

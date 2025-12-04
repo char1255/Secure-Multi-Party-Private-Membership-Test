@@ -32,8 +32,8 @@ namespace mpmt
             );
 
         rvector();                                      // 默认构造
-        explicit rvector(size_t n);                     // 指定大小构造
-        rvector(size_t n, const RT value);              // 指定大小 + 默认值构造
+        explicit rvector(uint64_t n);                   // 指定大小构造
+        rvector(uint64_t n, const RT value);            // 指定大小 + 默认值构造
         rvector(const std::vector<RT>& list);           // 列表构造
         rvector(const rvector& other);                  // 拷贝构造
         rvector(rvector&& other) noexcept;              // 移动构造
@@ -54,17 +54,17 @@ namespace mpmt
 
         /**
         * @brief   下标访问运算符
-        * @param   size_t index 索引位置
+        * @param   uint64_t index 索引位置
         * @return  RT& 对应位置的元素引用
         */
-        RT& operator[](size_t index);
+        RT& operator[](uint64_t index);
 
         /**
          * @brief   常量下标访问运算符
-         * @param   size_t index 索引位置
+         * @param   uint64_t index 索引位置
          * @return  const RT& 对应位置的常量元素引用
          */
-        const RT& operator[](size_t index) const;
+        const RT& operator[](uint64_t index) const;
 
         /**
          * @brief   向量-向量加法
@@ -130,9 +130,9 @@ namespace mpmt
 
         /**
          * @brief   常量下标访问运算符
-         * @return  size_t 向量大小
+         * @return  uint64_t 向量大小
          */
-        size_t size() const noexcept;
+        uint64_t size() const noexcept;
 
         /**
          * @brief   析构接口
@@ -143,7 +143,7 @@ namespace mpmt
 
     private:
         std::unique_ptr<RT[]> m_data;
-        size_t m_size;
+        uint64_t m_size;
 
         /** @brief 禁用大于运算符 */
         bool operator>(const rvector<RT>& other) const = delete;

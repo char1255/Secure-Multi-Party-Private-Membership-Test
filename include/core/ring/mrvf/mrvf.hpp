@@ -13,6 +13,7 @@ namespace mpmt
             is_ring_type<RT>,
             "RT must be ring1, ring8, ring16, ring32 or ring64."
             );
+            
 
         mrvf(mpmt::rvector<RT>&& rvec_to_move) noexcept
             :

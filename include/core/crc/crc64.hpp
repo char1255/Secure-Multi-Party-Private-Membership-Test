@@ -2,8 +2,6 @@
 #define CRC64_HPP
 
 #include <cstdint>
-#include <vector>
-#include "core/ring/ring.hpp"
 
 
 /** @namespace 项目命名空间 */
@@ -12,7 +10,8 @@ namespace mpmt
     class crc64
     {
     public:
-        static uint64_t compute(const uint8_t* const data, const size_t len);
+        // 计算最大 2^64-1 长度的 data
+        static uint64_t compute(const uint8_t* const data, const uint64_t len);
 
     private:
         // 实现使用CRC64-ECMA

@@ -66,6 +66,16 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
     endif()
 endif()
 
+# 添加宏
+# MPMT_VCB_STL    Vector Computing Backend: C++STL
+# MPMT_VCB_CUDA   Vector Computing Backend: CUDA Thrust
+# MPMT_VCB_XSIMD  Vector Computing Backend: XSIMD
+target_compile_definitions(${PENELOPE_PROJ_NAME} PRIVATE 
+    MPMT_DEBUG
+    MPMT_VCB_STL
+)
+
+
 # 链接依赖
 target_link_libraries(${PENELOPE_PROJ_NAME} PRIVATE
     OpenSSL::SSL

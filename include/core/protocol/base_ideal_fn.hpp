@@ -1,9 +1,6 @@
 #ifndef BASE_FUNC_HPP
 #define BASE_FUNC_HPP
 
-#include "core/mpmtcfg.hpp"
-#include "core/ring/ring.hpp"
-
 /** @namespace 项目命名空间。 */
 namespace mpmt
 {

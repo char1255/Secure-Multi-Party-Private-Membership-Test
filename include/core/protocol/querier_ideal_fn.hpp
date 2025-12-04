@@ -1,7 +1,6 @@
 #ifndef QUERIER_FUNC_HPP
 #define QUERIER_FUNC_HPP
 
-#include "core/mpmtcfg.hpp"
 #include "core/protocol/base_ideal_fn.hpp"
 
 /** @namespace 项目命名空间。 */

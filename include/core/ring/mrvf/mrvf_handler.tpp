@@ -3,6 +3,7 @@
 
 #include "core/mpmtcfg.hpp"
 #include "core/crc/crc64.hpp"
+#include "core/exception/mrvf_exc.hpp"
 
 namespace mpmt
 {
@@ -28,7 +29,7 @@ namespace mpmt
 
         // 2-偏移至 ring_size字段
         //  2.1-偏移输入流指针至offset
-        const size_t offset = mc_BOF_BYTE_SIZE;
+        const uint64_t offset = mc_BOF_BYTE_SIZE;
         in_file.seekg(offset);
 
         //  2.2-检查是否seek成功
@@ -49,7 +50,7 @@ namespace mpmt
         // 3-读取ring_size字段
         //  3.1-读取
         uint8_t ring_size;
-        size_t ring_size_byte_size = sizeof(uint8_t);
+        uint64_t ring_size_byte_size = sizeof(uint8_t);
         in_file.read((char*)&ring_size, ring_size_byte_size);
 
         //  3.2-检查是否读入成功
@@ -128,7 +129,7 @@ namespace mpmt
                     + "] correctly."
                 );
             }
-            const size_t c_file_byte_size = static_cast<size_t>(pos);
+            const uint64_t c_file_byte_size = static_cast<uint64_t>(pos);
             in_file.seekg(0, std::ios::beg);
             if (!in_file.good())
             {
@@ -188,10 +189,10 @@ namespace mpmt
 
             // 3-从缓冲区读出数据
             //  3.1-初始化读指针
-            size_t ipointer = 0ULL;
+            uint64_t ipointer = 0ULL;
 
             //  3.2-读取文件头并校验
-            for (size_t i = 0;i < mc_BOF_BYTE_SIZE;++i)
+            for (uint64_t i = 0;i < mc_BOF_BYTE_SIZE;++i)
             {
                 if (file_buffer[i + ipointer] != mc_BOF[i])
                 {
@@ -228,7 +229,7 @@ namespace mpmt
 
             //  3.4-读入向量大小字段 
             //  (1) 读入字段
-            size_t rvector_size;
+            uint64_t rvector_size;
             std::memcpy
             (
                 reinterpret_cast<char*>(&rvector_size),
@@ -236,7 +237,7 @@ namespace mpmt
                 mc_RVECTOR_SIZE_BYTE_SIZE
             );
             ipointer += mc_RVECTOR_SIZE_BYTE_SIZE;
-            const size_t c_rvector_byte_size = rvector_size * sizeof(RT);
+            const uint64_t c_rvector_byte_size = rvector_size * sizeof(RT);
             //  (2) 检查文件是否意外损害
             if (c_rvector_byte_size + mc_MIN_FILE_SIZE != c_file_byte_size)
             {
@@ -277,7 +278,7 @@ namespace mpmt
                 mc_CRC64_BYTE_SIZE
             );
             // (2) 计算CRC校验长度
-            const size_t c_crc64_compute_len
+            const uint64_t c_crc64_compute_len
                 = mc_RING_SIZE_BYTE_SIZE
                 + mc_RVECTOR_SIZE_BYTE_SIZE
                 + c_rvector_byte_size;
@@ -305,7 +306,7 @@ namespace mpmt
             ipointer += mc_CRC64_BYTE_SIZE;
 
             // 3.7 比较件尾
-            for (size_t i = 0;i < mc_EOF_BYTE_SIZE;++i)
+            for (uint64_t i = 0;i < mc_EOF_BYTE_SIZE;++i)
             {
                 if (file_buffer[i + ipointer] != mc_EOF[i])
                 {
@@ -387,11 +388,11 @@ namespace mpmt
             // 2-建立文件缓存区 
             //  2.1-计算常用长度
             //  (1) 向量长度
-            const size_t c_rvector_size = mrvf_obj.m_rvector.size();
+            const uint64_t c_rvector_size = mrvf_obj.m_rvector.size();
             //  (2) 向量在文件中的实际存储大小（字节）
-            const size_t c_rvector_byte_size = c_rvector_size * sizeof(RT);
+            const uint64_t c_rvector_byte_size = c_rvector_size * sizeof(RT);
             //  (3) 文件大小（字节）
-            const size_t c_file_byte_size           // 单位：字节
+            const uint64_t c_file_byte_size         // 单位：字节
                 = mc_MIN_FILE_SIZE                  // 文件头+环大小字段+向量大小字段+crc校验码字段+文件尾
                 + c_rvector_byte_size;              // 数据段大小
 
@@ -401,10 +402,10 @@ namespace mpmt
 
             // 3-向缓冲区写入文件
             //  3.1-初始化写指针
-            size_t opointer = 0ULL;
+            uint64_t opointer = 0ULL;
 
             //  3.2-写入文件头
-            for (size_t i = 0;i < mc_BOF_BYTE_SIZE;++i)
+            for (uint64_t i = 0;i < mc_BOF_BYTE_SIZE;++i)
             {
                 file_buffer[i + opointer] = mc_BOF[i];
             }
@@ -434,7 +435,7 @@ namespace mpmt
 
             // 3.6 进行crc64校验码计算，并写入文件
             // (1) 计算CRC校验长度
-            const size_t c_crc64_compute_len
+            const uint64_t c_crc64_compute_len
                 = mc_RING_SIZE_BYTE_SIZE
                 + mc_RVECTOR_SIZE_BYTE_SIZE
                 + c_rvector_byte_size;
@@ -454,7 +455,7 @@ namespace mpmt
             opointer += mc_CRC64_BYTE_SIZE;
 
             // 3.7 写入文件尾
-            for (size_t i = 0;i < mc_EOF_BYTE_SIZE;++i)
+            for (uint64_t i = 0;i < mc_EOF_BYTE_SIZE;++i)
             {
                 file_buffer[i + opointer] = mc_EOF[i];
             }

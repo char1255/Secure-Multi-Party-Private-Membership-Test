@@ -1,7 +1,6 @@
 #ifndef RING_HPP
 #define RING_HPP
 #include <cstdint>
-#include <stdexcept>
 #include <iostream>
 /** @namespace 项目命名空间。*/
 namespace mpmt

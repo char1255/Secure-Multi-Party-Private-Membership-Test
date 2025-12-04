@@ -9,15 +9,13 @@ namespace mpmt
 {
     /**
      * @class   使用openssl实现随机数适配器
-     * @tparam  DT 随机数数据类型，限定为 ring1, ring8, ring16 ring32, ring64, size_t
+     * @tparam  DT 随机数数据类型，限定为 ring1, ring8, ring16 ring32, ring64
      * @throw   throw mpmt::rng_exc("", mpmt::rng_exc::impl_type) 随机数生成错误
      */
     template <typename DT>
     class rng_openssl : public rng_adapter<DT>
     {
     public:
-
-        using rcontainer = typename rng_adapter<DT>::rcontainer;
 
         /** @brief 默认构造函数。*/
         rng_openssl() = default;
@@ -30,24 +28,24 @@ namespace mpmt
 
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数数组。
-         * @param   const size_t num 随机数数组的大小
-         * @return  rcontainer 随机数数组。
+         * @param   const uint64_t num 随机数数组的大小
+         * @return  std::vector<DT> 随机数数组。
          * @note    1. 需要保障 lb <= ub。
          *          2. 尽量使用移动语义处理返回。
          */
-        rcontainer rand(const size_t num) const override;
+        std::vector<DT> rand(const uint64_t num) const override;
 
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数数组。
-         * @param   const size_t num 随机数数组的大小
+         * @param   const uint64_t num 随机数数组的大小
          * @return  void
          * @note    1. 需要保障 lb <= ub。
          *          2. 如何rands大小与num一致。
          */
         void rand
         (
-            const size_t num,
-            rcontainer& rands
+            const uint64_t num,
+            std::vector<DT>& rands
         ) const override;
 
         /**
@@ -67,24 +65,24 @@ namespace mpmt
          * @brief   返回属于[lb, ub]\mathbb{Z}_{2^32}上，大小为num的随机数数组
          * @param   const DT lb 取值下界
          * @param   const DT ub 取值上界
-         * @param   const size_t num 随机数数组的大小
-         * @return  rcontainer 新构造的随机数数组
+         * @param   const uint64_t num 随机数数组的大小
+         * @return  std::vector<DT> 新构造的随机数数组
          * @note    1. 需要保障 lb <= ub。
          *          2. 尽量使用移动语义处理返回。
          */
-        rcontainer rand
+        std::vector<DT> rand
         (
             const DT lb,
             const DT ub,
-            const size_t num
+            const uint64_t num
         ) const override;
 
         /**
          * @brief   返回属于[lb, ub]\mathbb{Z}_{2^32}上，大小为num的随机数数组
          * @param   const DT lb 取值下界
          * @param   const DT ub 取值上界
-         * @param   const size_t num 随机数数组的大小
-         * @param   rcontainer& rands 用于返回生成的随机数数组
+         * @param   const uint64_t num 随机数数组的大小
+         * @param   std::vector<DT>& rands 用于返回生成的随机数数组
          * @return  void
          * @note    1. 需要保障 lb <= ub。
          *          2. 如何rands大小与num一致。
@@ -93,8 +91,8 @@ namespace mpmt
         (
             const DT lb,
             const DT ub,
-            const size_t num,
-            rcontainer& rands
+            const uint64_t num,
+            std::vector<DT>& rands
         ) const override;
 
         /**

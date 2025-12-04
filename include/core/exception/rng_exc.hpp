@@ -1,8 +1,8 @@
 #ifndef RNG_EXC_HPP
 #define RNG_EXC_HPP
 
-#include <stdexcept>
 #include <string>
+#include <stdexcept>
 #include "core/mpmtcfg.hpp"
 
 /** @namespace 项目命名空间 */
@@ -19,14 +19,20 @@ namespace mpmt
 
         explicit rng_exc
         (
-            const impl_type& type,
+            const impl_type type,
             const std::string& info
         ) :
             m_type(type),
             std::runtime_error(build_message(type, info))
         {}
+
+        const impl_type get_impl_type()
+        {
+            return m_type;
+        }
+
     private:
-        impl_type m_type;
+        const impl_type m_type;
 
         static std::string build_message(impl_type type, const std::string& info)
         {

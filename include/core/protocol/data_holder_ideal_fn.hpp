@@ -1,7 +1,6 @@
 #ifndef DATA_HOLDER_FUNC_HPP
 #define DATA_HOLDER_FUNC_HPP
 
-#include "core/mpmtcfg.hpp"
 #include "core/protocol/base_ideal_fn.hpp"
 
 /** @namespace 项目命名空间。 */

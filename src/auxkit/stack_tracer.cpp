@@ -6,7 +6,6 @@
 #include <dbghelp.h>
 #include <cstdio>
 #include <vector>
-#include <string>
 
 namespace utils
 {
