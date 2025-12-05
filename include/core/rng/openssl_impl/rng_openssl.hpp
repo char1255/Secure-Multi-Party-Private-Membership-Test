@@ -4,19 +4,19 @@
 #include <openssl/rand.h>
 #include "core/rng/rng_adapter.hpp"
 
+
 /** @namespace 项目命名空间。 */
 namespace mpmt
 {
     /**
      * @class   使用openssl实现随机数适配器
-     * @tparam  DT 随机数数据类型，限定为 ring1, ring8, ring16 ring32, ring64
+     * @tparam  DT 随机数数据类型，限定为 uint1, uint8, uint16 uint32, uint64
      * @throw   throw mpmt::rng_exc("", mpmt::rng_exc::impl_type) 随机数生成错误
      */
     template <typename DT>
     class rng_openssl : public rng_adapter<DT>
     {
     public:
-
         /** @brief 默认构造函数。*/
         rng_openssl() = default;
 
@@ -28,25 +28,12 @@ namespace mpmt
 
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数数组。
-         * @param   const uint64_t num 随机数数组的大小
+         * @param   const uint32_t size 随机数数组的大小
          * @return  std::vector<DT> 随机数数组。
          * @note    1. 需要保障 lb <= ub。
          *          2. 尽量使用移动语义处理返回。
          */
-        std::vector<DT> rand(const uint64_t num) const override;
-
-        /**
-         * @brief   返回\mathbb{Z}_{2^32}上的随机数数组。
-         * @param   const uint64_t num 随机数数组的大小
-         * @return  void
-         * @note    1. 需要保障 lb <= ub。
-         *          2. 如何rands大小与num一致。
-         */
-        void rand
-        (
-            const uint64_t num,
-            std::vector<DT>& rands
-        ) const override;
+        rng_array<DT> rand(const uint32_t size) const override;
 
         /**
          * @brief   返回属于[lb, ub]\mathbb{Z}_{2^32}上的随机数。
@@ -62,37 +49,20 @@ namespace mpmt
         ) const override;
 
         /**
-         * @brief   返回属于[lb, ub]\mathbb{Z}_{2^32}上，大小为num的随机数数组
+         * @brief   返回属于[lb, ub]\mathbb{Z}_{2^32}上，大小为size的随机数数组
          * @param   const DT lb 取值下界
          * @param   const DT ub 取值上界
-         * @param   const uint64_t num 随机数数组的大小
-         * @return  std::vector<DT> 新构造的随机数数组
-         * @note    1. 需要保障 lb <= ub。
-         *          2. 尽量使用移动语义处理返回。
-         */
-        std::vector<DT> rand
-        (
-            const DT lb,
-            const DT ub,
-            const uint64_t num
-        ) const override;
-
-        /**
-         * @brief   返回属于[lb, ub]\mathbb{Z}_{2^32}上，大小为num的随机数数组
-         * @param   const DT lb 取值下界
-         * @param   const DT ub 取值上界
-         * @param   const uint64_t num 随机数数组的大小
+         * @param   const uint32_t size 随机数数组的大小
          * @param   std::vector<DT>& rands 用于返回生成的随机数数组
          * @return  void
          * @note    1. 需要保障 lb <= ub。
-         *          2. 如何rands大小与num一致。
+         *          2. 如何rands大小与size一致。
          */
-        void rand
+        rng_array<DT> rand
         (
-            const DT lb,
-            const DT ub,
-            const uint64_t num,
-            std::vector<DT>& rands
+            const DT lb, 
+            const DT ub, 
+            const uint32_t size
         ) const override;
 
         /**
