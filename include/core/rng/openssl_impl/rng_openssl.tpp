@@ -7,9 +7,9 @@
 /** @namespace 项目命名空间。 */
 namespace mpmt
 {
-   template <typename DT>
-   DT rng_openssl<DT>::rand() const
-   {
+	template <typename DT>
+	DT rng_openssl<DT>::rand() const
+	{
 		DT r = 0;
 		if (RAND_bytes((unsigned char*)&r, sizeof(DT)) != 1)
 		{
@@ -20,11 +20,11 @@ namespace mpmt
 			);
 		}
 		return r;
-   }
+   	}
 
-   template <typename DT>
-   rng_array<DT> rng_openssl<DT>::rand(const uint32_t size) const
-   {
+	template <typename DT>
+	rng_array<DT> rng_openssl<DT>::rand(const uint32_t size) const
+	{
       	rng_array<DT> result(size);
 
 		if (result.m_size != 0)
@@ -40,11 +40,11 @@ namespace mpmt
 		}
 
 		return result;
-   }
+    }
 
-   template <typename DT>
-   DT rng_openssl<DT>::rand(const DT lb, const DT ub) const
-   {
+	template <typename DT>
+	DT rng_openssl<DT>::rand(const DT lb, const DT ub) const
+	{
 		MPMT_ASSERT(lb <= ub, "invalid input, lower bound (LB) is greater than upper bound (UB).");
 	
 		const DT maxv = std::numeric_limits<DT>::max();
@@ -74,16 +74,16 @@ namespace mpmt
 		} while (r >= threshold);
 
 		return (r % range) + lb;
-   }
+   	}
 
-   template <typename DT>
-   rng_array<DT> rng_openssl<DT>::rand
-   (
+	template <typename DT>
+	rng_array<DT> rng_openssl<DT>::rand
+	(
 		const DT lb,
 		const DT ub,
 		const uint32_t size
-   ) const
-   {
+	) const
+	{
 		MPMT_ASSERT(lb <= ub, "invalid input, lower bound (LB) is greater than upper bound (UB).");
 
 		const DT maxv = std::numeric_limits<DT>::max();
@@ -129,5 +129,5 @@ namespace mpmt
 			}
 		}
 		return result;
-   }
+    }
 }
