@@ -32,13 +32,13 @@ namespace mpmt
             "DT must be uint8_t, uint16_t, uint32_t or uint64_t."
         );
 
-        explicit rng_array(const uint32_t size)
+        explicit rng_array(const uint64_t size)
             :
             m_data(size == 0 ? nullptr : std::make_unique<DT[]>(size)),
             m_size(size)
         {}
 
-        explicit rng_array(const uint32_t size, const DT default_value)
+        explicit rng_array(const uint64_t size, const DT default_value)
             : rng_array(size)
         {
             if (m_size != 0) {
@@ -54,7 +54,7 @@ namespace mpmt
         rng_array& operator=(rng_array&&) noexcept = default;
 
         std::unique_ptr<DT[]> m_data;
-        uint32_t m_size;
+        uint64_t m_size;
     };
 
     /**
@@ -79,10 +79,10 @@ namespace mpmt
 
         /**
          * @brief   返回\mathbb{Z}_{2^n}上的随机数数组。
-         * @param   const uint32_t size 随机数数组的大小
+         * @param   const uint64_t size 随机数数组的大小
          * @return  rng_array<DT> 随机数数组。
          */
-        virtual rng_array<DT> rand(const uint32_t size) const = 0;
+        virtual rng_array<DT> rand(const uint64_t size) const = 0;
 
 
         /**
@@ -98,7 +98,7 @@ namespace mpmt
          * @brief   返回属于[lb, ub]\mathbb{Z}_{2^n}上，大小为size的随机数数组
          * @param   const DT lb 取值下界
          * @param   const DT ub 取值上界
-         * @param   const uint32_t size 随机数数组的大小
+         * @param   const uint64_t size 随机数数组的大小
          * @return  rng_array<DT>
          * @note    需要保障 lb <= ub。
          */
@@ -106,7 +106,7 @@ namespace mpmt
         (
             const DT lb, 
             const DT ub, 
-            const uint32_t size
+            const uint64_t size
         ) const = 0;
 
         /**

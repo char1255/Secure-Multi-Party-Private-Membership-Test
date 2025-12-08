@@ -23,7 +23,7 @@ namespace mpmt
    	}
 
 	template <typename DT>
-	rng_array<DT> rng_openssl<DT>::rand(const uint32_t size) const
+	rng_array<DT> rng_openssl<DT>::rand(const uint64_t size) const
 	{
       	rng_array<DT> result(size);
 
@@ -81,7 +81,7 @@ namespace mpmt
 	(
 		const DT lb,
 		const DT ub,
-		const uint32_t size
+		const uint64_t size
 	) const
 	{
 		MPMT_ASSERT(lb <= ub, "invalid input, lower bound (LB) is greater than upper bound (UB).");
@@ -112,7 +112,7 @@ namespace mpmt
 			}
 	
 			const DT threshold = maxv - (maxv % range);
-			for (uint32_t i = 0; i < result.m_size; ++i)
+			for (uint64_t i = 0; i < result.m_size; ++i)
 			{
 				while(arr[i] >= threshold)
 				{

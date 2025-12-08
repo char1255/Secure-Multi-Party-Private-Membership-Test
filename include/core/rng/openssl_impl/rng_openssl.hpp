@@ -28,12 +28,12 @@ namespace mpmt
 
         /**
          * @brief   返回\mathbb{Z}_{2^32}上的随机数数组。
-         * @param   const uint32_t size 随机数数组的大小
+         * @param   const uint64_t size 随机数数组的大小
          * @return  std::vector<DT> 随机数数组。
          * @note    1. 需要保障 lb <= ub。
          *          2. 尽量使用移动语义处理返回。
          */
-        rng_array<DT> rand(const uint32_t size) const override;
+        rng_array<DT> rand(const uint64_t size) const override;
 
         /**
          * @brief   返回属于[lb, ub]\mathbb{Z}_{2^32}上的随机数。
@@ -52,7 +52,7 @@ namespace mpmt
          * @brief   返回属于[lb, ub]\mathbb{Z}_{2^32}上，大小为size的随机数数组
          * @param   const DT lb 取值下界
          * @param   const DT ub 取值上界
-         * @param   const uint32_t size 随机数数组的大小
+         * @param   const uint64_t size 随机数数组的大小
          * @param   std::vector<DT>& rands 用于返回生成的随机数数组
          * @return  void
          * @note    1. 需要保障 lb <= ub。
@@ -62,13 +62,16 @@ namespace mpmt
         (
             const DT lb, 
             const DT ub, 
-            const uint32_t size
+            const uint64_t size
         ) const override;
 
         /**
          * @brief   析构接口。
          */
         ~rng_openssl() override = default;
+
+    private:
+        static constexpr uint64_t mc_BLOCK_SIZE = 1ULL << 25; // 每次生成的块长度
     };
 }
 
