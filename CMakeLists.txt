@@ -35,6 +35,7 @@ add_compile_options(-O2)
 #   1. XSIMD    13.2.0
 find_package(OpenSSL REQUIRED)          # OpenSSL
 find_package(xsimd CONFIG REQUIRED)     # XSIMD
+find_package(nlohmann_json CONFIG REQUIRED)
 
 # 添加可执行文件
 add_executable(${PENELOPE_PROJ_NAME} 
@@ -83,6 +84,7 @@ target_link_libraries(${PENELOPE_PROJ_NAME} PRIVATE
     xsimd
     dbghelp
     kernel32
+    nlohmann_json::nlohmann_json
 )
 
 # 指定 include 路径
