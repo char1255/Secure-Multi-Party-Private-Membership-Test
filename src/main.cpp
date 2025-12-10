@@ -273,7 +273,7 @@ struct test_res
     ring64 checksum;
 };
 
-static const size64 test_times = 30;
+static const size64 test_times = 10;
 
 test_res test_script(const size64 rngsize, const ring64 lb, const ring64 ub)
 {
@@ -385,11 +385,11 @@ test_res test_script(const size64 rngsize, const ring64 lb, const ring64 ub)
     }
 
     test_res result;
-    result.res_bench  = res_bench;
-    result.res_batch  = res_batch;
-    result.res_call   = res_call;
-    result.res_best   = res_best;
-    result.res_window = res_window;
+    result.res_bench  = res_bench / test_times;
+    result.res_batch  = res_batch / test_times;
+    result.res_call   = res_call  / test_times;
+    result.res_best   = res_best  / test_times;
+    result.res_window = res_window/ test_times;
     result.checksum   = check_sum_batch + check_sum_window + check_sum_call + check_sum_best;
     return  result;
 }
@@ -400,12 +400,20 @@ int main(int argc, char** argv)
 
     std::vector<size64> rng_size = 
     {
-        1ULL << 16,1ULL << 20,1ULL << 22, 1ULL << 24,1ULL << 26, 1ULL << 28
+        1ULL << 16,
     };
 
     std::vector<size64> range_size = 
     {
-        1ULL << 16,1ULL << 20,1ULL << 22, 1ULL << 24,1ULL << 26, 1ULL << 28
+        (1ULL << 63),
+        (1ULL << 63) + 1,
+        (1ULL << 63) + 1 + 1 * (1ULL << 60),
+        (1ULL << 63) + 1 + 2 * (1ULL << 60),
+        (1ULL << 63) + 1 + 3 * (1ULL << 60),
+        (1ULL << 63) + 1 + 4 * (1ULL << 60),
+        (1ULL << 63) + 1 + 5 * (1ULL << 60),
+        (1ULL << 63) + 1 + 6 * (1ULL << 60),
+        (1ULL << 63) + 1 + 7 * (1ULL << 60),
     };
 
     size64 total_steps = rng_size.size() * range_size.size();
@@ -458,3 +466,10 @@ int main(int argc, char** argv)
     outfile << j.dump(4);
     outfile.close();
 }
+
+// g++ -std=c++17 -O2 benchmark.cpp \
+//     -I./indicators/include \
+//     -I/path/to/nlohmann/json \
+//     -lssl -lcrypto \
+//     -o bench
+
