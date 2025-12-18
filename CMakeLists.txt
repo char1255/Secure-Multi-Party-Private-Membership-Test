@@ -45,9 +45,6 @@ add_executable(${PENELOPE_PROJ_NAME}
     src/core/protocol/ass_impl/agent_ass.cpp
     src/core/protocol/ass_impl/data_holder_ass.cpp
     src/core/protocol/ass_impl/querier_ass.cpp
-    src/core/protocol/fss_impl/agent_fss.cpp
-    src/core/protocol/fss_impl/data_holder_fss.cpp
-    src/core/protocol/fss_impl/querier_fss.cpp
     src/auxkit/profiler.cpp
     src/auxkit/stack_tracer.cpp
 )
